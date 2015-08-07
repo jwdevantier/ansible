@@ -1,0 +1,6 @@
+
+i3_inst_root: "{{ansible_user_dir}}"
+
+#present|absent
+i3__state: present
+i3__nuke: false

@@ -1,0 +1,11 @@
+---
+- name: debian | install software
+  apt:
+    state: present
+    name: "{{ item }}"
+    update_cache: true
+    cache_valid: 3600
+  with_items:
+    - i3
+    - dmenu
+  sudo: yes

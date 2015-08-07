@@ -1,0 +1,7 @@
+---
+
+- include: cleanup.yml
+  when: i3__state == "absent"
+
+- include: setup.yml
+  when: i3__state == "present"

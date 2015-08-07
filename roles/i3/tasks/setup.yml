@@ -1,0 +1,65 @@
+---
+- include: inst_fedora.yml
+  when: "{{ansible_distribution|lower == 'fedora'}}"
+
+- include: inst_debian.yml
+  when: "{{ansible_os_family|lower == 'debian'}}"
+
+# Install i3blocks (if necessary)
+- stat: path=/usr/local/bin/i3blocks
+  register: st_i3blocks
+- include: inst_i3blocks.yml
+  when: not st_i3blocks.stat.exists
+
+- name: prep | determine template path structure
+  command: find . -type d
+  args:
+    chdir: "{{ role_path }}/templates/user_dir"
+  register: template_dirs
+  changed_when: 0
+
+- name: prep | determine file path structure
+  command: find . -type d
+  args:
+    chdir: "{{ role_path }}/files/user_dir"
+  register: file_dirs
+  changed_when: 0
+
+- name: prep | create i3 directories
+  file:
+    path: "{{ i3_inst_root }}/{{ item }}"
+    state: directory
+    recurse: true
+  with_items:
+    - "{{template_dirs.stdout_lines}}"
+    - "{{file_dirs.stdout_lines}}"
+
+- name: prep | get paths to template files
+  command: find . -iname '*.j2' -type f
+  args:
+    chdir: "{{ role_path }}/templates/user_dir"
+  register: template_paths
+  changed_when: 0
+
+- name: prep | get paths to files
+  command: find . -type f
+  args:
+    chdir: "{{ role_path }}/files/user_dir"
+  register: file_paths
+  changed_when: 0
+
+- name: install | install i3 files
+  copy:
+    src: "user_dir/{{ item }}"
+    dest: "{{ i3_inst_root }}/{{ item }}"
+    mode: 0700
+  with_items:
+    - "{{ file_paths.stdout_lines }}"
+
+- name: install | install templated i3 files
+  template:
+    src: "user_dir/{{ item }}"
+    dest: "{{ i3_inst_root }}/{{ item.rstrip('.j2') }}"
+    mode: 0700
+  with_items:
+    - "{{ template_paths.stdout_lines }}"

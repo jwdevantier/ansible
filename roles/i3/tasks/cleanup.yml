@@ -1,0 +1,25 @@
+---
+
+- include: clean_fedora.yml
+  when: "{{ansible_distribution|lower == 'fedora'}}"
+
+- include: clean_debian.yml
+  when: "{{ansible_os_family|lower == 'debian'}}"
+
+- name: clean | remove i3blocks
+  file:
+    state: absent
+    path: "{{item}}"
+  with_items:
+    - /usr/local/etc/i3blocks.conf
+    - /usr/local/bin/i3blocks
+    - /usr/local/libexec/i3blocks/
+  sudo: yes
+
+- name: clean | remove i3 config
+  file:
+    state: absent
+    path: "{{item}}"
+  with_items:
+    - "{{i3_inst_root}}/.i3"
+    - "{{i3_inst_root}}/.i3blocks.conf"

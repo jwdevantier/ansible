@@ -1,0 +1,34 @@
+---
+
+- name: prep | clone i3blocks
+  git:
+    repo: https://github.com/vivien/i3blocks.git
+    dest: "/tmp/i3blocks"
+    depth: 1
+    force: true
+
+- name: prep | compile i3blocks
+  command: make
+  args:
+    chdir: "/tmp/i3blocks"
+
+# patch makefile to avoid installing 'ronn' (ruby gem) to generate
+# some man pages - seems like a waste.
+- lineinfile:
+    state: present
+    regexp: '^install: all man'
+    line: 'install: all'
+    dest: /tmp/i3blocks/Makefile
+- lineinfile:
+    state: absent
+    regexp: '^\s+install.*man.*'
+    dest: /tmp/i3blocks/Makefile
+
+- name: install | install i3blocks
+  command: make install
+  args:
+    chdir: "/tmp/i3blocks"
+  sudo: yes
+
+- name: cleanup | remove i3blocks source
+  file: path="/tmp/i3blocks" state="absent"

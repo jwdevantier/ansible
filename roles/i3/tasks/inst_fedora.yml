@@ -1,0 +1,10 @@
+---
+
+- name: fedora | install software
+  dnf:
+    state: present
+    name: "{{ item }}"
+  with_items:
+    - i3
+    - dmenu
+  sudo: yes

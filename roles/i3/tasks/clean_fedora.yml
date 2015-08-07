@@ -1,0 +1,9 @@
+---
+- name: fedora | remove software
+  dnf:
+    name: "{{item}}"
+    state: absent
+  with_items:
+    - i3
+    - dmenu
+  sudo: yes

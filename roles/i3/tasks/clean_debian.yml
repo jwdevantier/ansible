@@ -1,0 +1,9 @@
+---
+- name: debian | remove software
+  apt:
+    state: absent
+    name: "{{ item }}"
+  with_items:
+    - i3
+    - dmenu
+  sudo: yes
