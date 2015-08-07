@@ -1,5 +1,4 @@
 ---
-#TODO: add old PATH to ~.zshrc if need be
 - name: fedora | install | install ZSH shell
   dnf: name=zsh state=present
   when: "{{ansible_distribution|lower == 'fedora'}}"
@@ -15,26 +14,51 @@
     dest: "{{ ozsh__home }}"
     depth: 1
 
-- stat: path="{{ ansible_user_dir }}/.zshrc"
+- stat: path="{{ ozsh__dist_rc }}"
+  register: dist_zshrc_st
+
+- name: processing | determining if ~/.zshrc.dist is from oh-my-zsh
+  shell: "{{ 'grep $ZSH/oh-my-zsh.sh ' + ozsh__dist_rc }}"
+  failed_when: 0
+  changed_when: 0
+  when: dist_zshrc_st.stat.islnk is defined
+  register: dist_zshrc_grep
+
+- set_fact:
+    doinst_dist_zshrc: "{{dist_zshrc_grep|skipped or dist_zshrc_grep.rc != 0}}"
+
+- name: config | installing ~/.zshrc.dist
+  shell: cp "{{ ozsh__home }}/templates/zshrc.zsh-template" "{{ ozsh__dist_rc }}"
+  when: doinst_dist_zshrc
+
+# Grep for zshrc_template_tag, if not present, back up and install template
+- stat: path="{{ ozsh__dist_rc }}"
   register: zshrc_st
 
-- name: processing | determining if ~/.zshrc is from oh-my-zsh
-  shell: grep 'source $ZSH/oh-my-zsh.sh' ~/.zshrc
+- name: processing | determining if ~/.zshrc is from this role
+  shell: "{{ 'grep ' + ozsh__rc_grep_key + ' ' + ozsh__rc }}"
   failed_when: 0
   changed_when: 0
   when: zshrc_st.stat.islnk is defined
   register: zshrc_grep
 
 - set_fact:
-    doinst_zshrc: "{{zshrc_grep|skipped or zshrc_grep.rc != 0}}"
+    do_backup_zshrc: "{{zshrc_grep is defined and zshrc_grep.skipped|default(false) == false and zshrc_grep.rc != 0}}"
 
-- name: config | backing up old ~/.zshrc to ~/.zshrc_old_<date here>
-  shell: cp "{{ ansible_user_dir }}/.zshrc" "{{ansible_user_dir}}/.zshrc_old_`date -I`"
-  when: doinst_zshrc
+- name: config | appending '.old.<date here>' to old .zshrc file
+  shell: cp "{{ ozsh__rc }}" "{{ ozsh__rc }}.old.`date -I`"
+  when: do_backup_zshrc
 
-- name: config | installing ~/.zshrc
-  shell: cp "{{ ozsh__home }}/templates/zshrc.zsh-template" "{{ ansible_user_dir }}/.zshrc"
-  when: doinst_zshrc
+- name: config | create .zshcfg.dist directory
+  file:
+    state: directory
+    path: "{{ozsh__cfg_dist}}"
+
+- name: config | installing new .zshrc
+  template:
+    src: .zshrc.j2
+    dest: "{{ ozsh__rc }}"
+    mode: 0600
 
 - name: processing | determining path to zsh
   shell: grep '/zsh$' /etc/shells | tail -1

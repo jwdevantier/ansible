@@ -1,0 +1,35 @@
+## WARNING!
+## This file is auto-generated and WILL be subject to additional edits.
+## Do *NOT* alter ANYTHING in here as it may be lost
+## Instead, please make your changes in:
+## * '{{ozsh__dist_rc}}'
+## * '{{ozsh__cfg_usr}}/<priority>-<your-cfg-file>.zsh'
+##
+## <priority> indicates when the file is run. E.g. '99-stuff.zsh' is run
+## last and so its changes may override any made in the preceding files.
+##
+## NOTE - files in '{{ozsh__cfg_usr}}' will override settings in
+##        '{{ozsh__cfg_dist}}' - use this to make personal changes.
+##
+## Do *NOT* change the following as it will break the ansible role:
+## file id: <{{ozsh__rc_grep_key}}>
+##
+
+# Load configuration, BSD-init style
+####################################
+# Distribution defaults
+
+if [[ -d "{{ozsh__cfg_dist}}" ]]; then
+  cfgs=`ls "{{ozsh__cfg_dist}}/"*.zsh` 2>/dev/null
+  for i in $cfgs; do
+    source "$i"
+  done
+fi
+
+# Personalised changes/overrides
+if [[ -d "{{ozsh__cfg_usr}}" ]]; then
+  cfgs=`ls "{{ozsh__cfg_usr}}/"*.zsh` 2>/dev/null
+  for i in $cfgs; do
+    source "$i"
+  done
+fi
