@@ -1,0 +1,8 @@
+---
+
+# Many other roles will refer to this when installing zsh env files
+global_zsh_env_dir: "{{ansible_user_dir}}/.zshcfg.dist"
+ozsh__dist_rc: "{{ global_zsh_env_dir }}"
+
+# Many other roles will refer to this when installing applications
+global_app_dir: "{{ ansible_user_dir }}/apps"
