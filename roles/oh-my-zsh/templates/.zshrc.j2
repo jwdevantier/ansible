@@ -2,7 +2,7 @@
 ## This file is auto-generated and WILL be subject to additional edits.
 ## Do *NOT* alter ANYTHING in here as it may be lost
 ## Instead, please make your changes in:
-## * '{{ozsh__dist_rc}}'
+## * '{{ozsh__cfg_dist}}'
 ## * '{{ozsh__cfg_usr}}/<priority>-<your-cfg-file>.zsh'
 ##
 ## <priority> indicates when the file is run. E.g. '99-stuff.zsh' is run
@@ -15,21 +15,34 @@
 ## file id: <{{ozsh__rc_grep_key}}>
 ##
 
+#Read in oh-my-zsh
+source "{{ ozsh__rc_dist }}"
+
 # Load configuration, BSD-init style
 ####################################
 # Distribution defaults
-
+{#
+   The complexity is sadly necessary - zsh will complain lest we use
+   nullglob suppression (which I can't figure out how works) OR redirect
+   the error to /dev/null. The latter requires a separate line which then
+   requires specifying how the cumulative output of the command should be
+   broken up and treated as an array.
+#}
 if [[ -d "{{ozsh__cfg_dist}}" ]]; then
-  cfgs=`ls "{{ozsh__cfg_dist}}/"*.zsh` 2>/dev/null
-  for i in $cfgs; do
-    source "$i"
+  saveIFS=$IFS;
+  IFS=$'\n'; cfgs=(`ls {{ozsh__cfg_dist}}/*.zsh`) 2>/dev/null
+  IFS=$saveIFS
+  for cfg in $cfgs; do
+    source "$cfg"
   done
 fi
 
 # Personalised changes/overrides
 if [[ -d "{{ozsh__cfg_usr}}" ]]; then
-  cfgs=`ls "{{ozsh__cfg_usr}}/"*.zsh` 2>/dev/null
-  for i in $cfgs; do
-    source "$i"
+  saveIFS=$IFS;
+  IFS=$'\n'; cfgs=(`ls {{ozsh__cfg_usr}}/*.zsh`) 2>/dev/null
+  IFS=$saveIFS
+  for cfg in $cfgs; do
+    source "$cfg"
   done
 fi

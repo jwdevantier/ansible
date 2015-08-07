@@ -14,11 +14,11 @@
     dest: "{{ ozsh__home }}"
     depth: 1
 
-- stat: path="{{ ozsh__dist_rc }}"
+- stat: path="{{ ozsh__rc_dist }}"
   register: dist_zshrc_st
 
 - name: processing | determining if ~/.zshrc.dist is from oh-my-zsh
-  shell: "{{ 'grep $ZSH/oh-my-zsh.sh ' + ozsh__dist_rc }}"
+  shell: "{{ 'grep $ZSH/oh-my-zsh.sh ' + ozsh__rc_dist }}"
   failed_when: 0
   changed_when: 0
   when: dist_zshrc_st.stat.islnk is defined
@@ -28,11 +28,11 @@
     doinst_dist_zshrc: "{{dist_zshrc_grep|skipped or dist_zshrc_grep.rc != 0}}"
 
 - name: config | installing ~/.zshrc.dist
-  shell: cp "{{ ozsh__home }}/templates/zshrc.zsh-template" "{{ ozsh__dist_rc }}"
+  shell: cp "{{ ozsh__home }}/templates/zshrc.zsh-template" "{{ ozsh__rc_dist }}"
   when: doinst_dist_zshrc
 
 # Grep for zshrc_template_tag, if not present, back up and install template
-- stat: path="{{ ozsh__dist_rc }}"
+- stat: path="{{ ozsh__rc_dist }}"
   register: zshrc_st
 
 - name: processing | determining if ~/.zshrc is from this role

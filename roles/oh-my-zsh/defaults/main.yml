@@ -1,9 +1,6 @@
 ---
 ozsh__home: "{{ansible_user_dir}}/.oh-my-zsh"
 
-# The config file which Oh-My-ZSH intends to install
-ozsh__dist_rc: "{{ansible_user_dir}}/.zshrc.dist"
-
 # Directory in which to place *.zsh files which will be sourced during
 # session initialization.
 ozsh__cfg_dist: "{{ansible_user_dir}}/.zshcfg.dist"
@@ -14,6 +11,8 @@ ozsh__cfg_usr: "{{ansible_user_dir}}/.zshcfg.override"
 # settings such as the ability to read, init.d-style environment files
 # !! other roles WILL depend on this
 ozsh__rc: "{{ansible_user_dir}}/.zshrc"
+# The config file which Oh-My-ZSH intends to install
+ozsh__rc_dist: "{{ozsh__rc}}.dist"
 
 #Key which we'll be using to figure out if an existing ~/.zshrc file is ours
 # -- ensure there's no spaces here
