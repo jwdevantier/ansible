@@ -29,4 +29,4 @@
 - name: install | install zsh env file
   template:
     src: zsh_env_file.j2
-    dest: "{{ godev__zsh_env_dir }}/50-goenv.zsh"
+    dest: "{{ godev__zsh_env_file }}"

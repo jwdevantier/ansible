@@ -6,6 +6,7 @@ godev__pkg_dst: "/tmp/golang-{{ godev__pkg_ver }}-linux.{{ godev__pkg_arch }}.ta
 
 godev__dstdir: "{{ global_app_dir }}"
 godev__zsh_env_dir: "{{ global_zsh_env_dir }}"
+godev__zsh_env_file: "{{ godev__zsh_env_dir }}/50-goenv.zsh"
 
 # Where go itself will be installed
 godev__goroot: "{{ godev__dstdir }}/go"
@@ -21,6 +22,9 @@ godev__gopath: "{{ ansible_user_dir }}/go"
 
 #present|absent
 godev__state: present
+# scary cleanup actions - in this case, it'll nuke GOPATH too, potentially
+# taking a lot of your source code with it.
+godev__nuke: false
 
 dev_packages:
   - { name: 'gocode', url: 'github.com/nsf/gocode' }

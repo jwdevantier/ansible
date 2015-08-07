@@ -1,1 +1,15 @@
 ---
+
+- name: cleanup | remove go directory
+  file:
+    state: absent
+    path: "{{ item }}"
+  with_items:
+    - "{{ godev__goroot }}"
+    - "{{ godev__zsh_env_file }}"
+
+- name: cleanup | nuke | removing user's go directory (!!!)
+  file:
+    state: absent
+    path: "{{ godev__gopath }}"
+  when: godev__nuke == true
