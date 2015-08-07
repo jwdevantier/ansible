@@ -1,0 +1,23 @@
+---
+
+#rstrip('...') because some urls may use these. (what does it do, exactly?)
+- name: check whether development packages are present
+  stat:
+    path: "{{ godev__gopath }}/src/{{ item.url.rstrip('...') }}"
+  register: st_pkgs
+  environment:
+    GOPATH: "{{ godev__gopath }}"
+    GOROOT: "{{ godev__goroot }}"
+    PATH: "{{ godev__gopath }}/bin:{{ godev__goroot }}/bin:{{ ansible_env.PATH}}"
+  with_items:
+    "{{ dev_packages }}"
+
+- name: go get missing packages
+  environment:
+    GOPATH: "{{ godev__gopath }}"
+    GOROOT: "{{ godev__goroot }}"
+    PATH: "{{ godev__gopath }}/bin:{{ godev__goroot }}/bin:{{ ansible_env.PATH}}"
+  shell: "go get {{ item.item.url }}"
+  when: "{{item.stat.exists == false}}"
+  with_items:
+    "{{ st_pkgs.results }}"

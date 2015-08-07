@@ -1,5 +1,11 @@
 ---
 
+- name: install | install mercurial (godef requirement)
+  dnf:
+    name: mercurial
+    state: present
+  sudo: yes
+
 #Check if we even need to bother with all this
 - stat:
     path: "{{ godev__version_tag }}"
@@ -17,6 +23,8 @@
 
 - include: doinst.yml
   when: do_inst == "True"
+
+- include: getpkgs.yml
 
 - name: install | install zsh env file
   template:

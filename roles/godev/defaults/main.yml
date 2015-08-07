@@ -21,3 +21,9 @@ godev__gopath: "{{ ansible_user_dir }}/go"
 
 #present|absent
 godev__state: present
+
+dev_packages:
+  - { name: 'gocode', url: 'github.com/nsf/gocode' }
+  - { name: 'godef', url: 'code.google.com/p/rog-go/exp/cmd/godef' }
+  - { name: 'gb', url: 'github.com/constabulary/gb/...' }
+  - { name: 'godep', url: 'github.com/tools/godep' }
