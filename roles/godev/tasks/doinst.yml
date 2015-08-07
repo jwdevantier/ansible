@@ -1,0 +1,35 @@
+---
+# Remove old dir if necessary
+- name: remove old go install
+  file:
+    state: absent
+    path: "{{ godev__goroot }}"
+
+- stat:
+    path: "{{ godev__pkg_dst }}"
+  register: st_golang_pkg
+
+- name: config | download Golang
+  get_url:
+    url: "{{ godev__pkg_url }}"
+    dest: "{{ godev__pkg_dst }}"
+    mode: 0755
+  when: st_golang_pkg.stat.exists == false
+
+- name: config | ensure dstdir exists
+  file:
+    path: "{{ godev__dstdir }}"
+    state: directory
+    recurse: true
+
+- name: install | extract go
+  unarchive:
+    src: "{{ godev__pkg_dst }}"
+    dest: "{{ godev__dstdir }}" #=> godev__root
+    copy: no
+    mode: 0755
+
+- name: install | install version tag file
+  template:
+    src: godev_version_tag.j2
+    dest: "{{ godev__version_tag }}"

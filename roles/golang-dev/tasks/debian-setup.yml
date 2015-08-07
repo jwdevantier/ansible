@@ -1,6 +1,0 @@
----
-
-- name: Not yet supported
-  debug: msg="This role does not yet contain the tasks necessary to install go on Ubuntu"
-  failed_when: true
-  run_once: true

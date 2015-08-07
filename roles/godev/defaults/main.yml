@@ -1,0 +1,23 @@
+---
+godev__pkg_arch: amd64
+godev__pkg_ver: 1.4.2
+godev__pkg_url: "https://storage.googleapis.com/golang/go{{ godev__pkg_ver }}.linux-{{ godev__pkg_arch }}.tar.gz"
+godev__pkg_dst: "/tmp/golang-{{ godev__pkg_ver }}-linux.{{ godev__pkg_arch }}.tar.gz"
+
+godev__dstdir: "{{ global_app_dir }}"
+godev__zsh_env_dir: "{{ global_zsh_env_dir }}"
+
+# Where go itself will be installed
+godev__goroot: "{{ godev__dstdir }}/go"
+
+# The version tag file will be used to skip the recipe if everything is
+# up-to-date. The tag will be a combination of the version (godev__pkg_ver)
+# and 'godev__role_version'.
+godev__version_tag: "{{ godev__goroot }}/.version"
+godev__role_version: r1
+
+# Where the user will hold local package installs, compiled binaries & source code
+godev__gopath: "{{ ansible_user_dir }}/go"
+
+#present|absent
+godev__state: present

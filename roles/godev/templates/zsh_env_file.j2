@@ -1,0 +1,5 @@
+{# needed iff not installed to '/usr/local/go' #}
+export GOROOT={{ godev__goroot }}
+{# user's go dir (pkg downloads etc) #}
+export GOPATH={{ godev__gopath }}
+export PATH=$GOPATH/bin:$GOROOT/bin:$PATH

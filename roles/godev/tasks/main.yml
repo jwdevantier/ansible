@@ -1,0 +1,7 @@
+---
+
+- include: cleanup.yml
+  when: godev__state == "absent"
+
+- include: setup.yml
+  when: godev__state == "present"

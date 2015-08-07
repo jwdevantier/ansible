@@ -1,7 +1,0 @@
----
-
-- name: install | installing Go from repos
-  dnf:
-    state: present
-    name: golang
-  sudo: yes

@@ -1,0 +1,24 @@
+---
+
+#Check if we even need to bother with all this
+- stat:
+    path: "{{ godev__version_tag }}"
+  register: st_vtag
+
+- shell: "cat {{ godev__version_tag }}"
+  when: st_vtag is defined and st_vtag.stat.exists
+  register: vtag_read
+  changed_when: 0
+
+- set_fact:
+    curr_vtag: "{{godev__pkg_ver}}-{{godev__role_version}}"
+- set_fact:
+    do_inst: "{{vtag_read|skipped or vtag_read.stdout|default('unset') != curr_vtag}}"
+
+- include: doinst.yml
+  when: do_inst == "True"
+
+- name: install | install zsh env file
+  template:
+    src: zsh_env_file.j2
+    dest: "{{ godev__zsh_env_dir }}/50-goenv.zsh"
