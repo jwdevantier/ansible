@@ -1,0 +1,14 @@
+---
+
+- name: fedora | add chrome repo
+  copy:
+    src: fedora/google-chrome.repo
+    dest: /etc/yum.repos.d/google-chrome.repo
+    owner: root
+    group: root
+    mode: 0644
+
+- name: fedora | install chrome
+  dnf:
+    name: google-chrome-stable
+    state: present

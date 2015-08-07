@@ -1,0 +1,7 @@
+---
+
+include: fedora-setup.yml
+when: "{{ansible_distribution|lower == 'fedora'}}"
+
+include: debian-setup.yml
+when: "{{ansible_os_family|lower}} == 'debian'"

@@ -1,0 +1,40 @@
+fedora_current: 22
+
+wrk_pkgs:
+  - make
+  - automake
+  - gcc
+  - gcc-c++
+  - kernel-devel
+  - i3
+  - dmenu
+  - emacs
+  - nmap-ncat
+  - clojure
+  - python3-virtualenv
+  - python-virtualenv
+  - python-jedi
+  - python3-jedi
+  - golang
+  - nodejs
+  - gstreamer1-plugins-bad-free
+  - gstreamer1-plugins-good
+  - vlc
+  - gnome-terminal
+  - nautilus
+  - file-roller
+  - evince
+  - liberation-mono-fonts
+  - liberation-sans-fonts
+  - liberation-serif-fonts
+  - levien-inconsolata-fonts
+  - adobe-source-code-pro-fonts
+  - mozilla-fira-mono-fonts
+  - google-droid-sans-mono-fonts
+  - dejavu-sans-mono-fonts
+  - NetworkManager
+  - NetworkManager-pptp-gnome
+  - NetworkManager-vpnc-gnome
+  - NetworkManager-wifi
+
+# still need to go get godef, gocode & gb

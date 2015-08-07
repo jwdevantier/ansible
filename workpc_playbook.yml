@@ -1,0 +1,17 @@
+ # ansible local -m setup --tree /tmp/facts
+- hosts: local
+  tags:
+    - software
+  vars_files:
+    - group_vars/local/main.yml
+  roles:
+    - role: oh-my-zsh
+      sudo: false
+#    - role: rpmfusion
+#      sudo: yes
+#    - role: chrome
+#      sudo: yes
+#    - role: spotify
+#      sudo: yes
+#    - role: software
+#      sudo: yes

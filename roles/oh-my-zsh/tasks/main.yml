@@ -1,0 +1,48 @@
+---
+#TODO: add old PATH to ~.zshrc if need be
+- name: fedora | install | install ZSH shell
+  dnf: name=zsh state=present
+  when: "{{ansible_distribution|lower == 'fedora'}}"
+  sudo: yes
+
+- name: debian/ubuntu | install | install ZSH shell
+  apt: name=zsh state=present cache_valid_time=3600 upcate_cache=true
+  when: "{{ansible_os_family|lower == 'debian'}}"
+
+- name: install | clone Oh-My-ZSH
+  git:
+    repo: https://github.com/robbyrussell/oh-my-zsh.git
+    dest: "{{ ozsh__home }}"
+    depth: 1
+
+- stat: path="{{ ansible_user_dir }}/.zshrc"
+  register: zshrc_st
+
+- name: processing | determining if ~/.zshrc is from oh-my-zsh
+  shell: grep 'source $ZSH/oh-my-zsh.sh' ~/.zshrc
+  failed_when: 0
+  changed_when: 0
+  when: zshrc_st.stat.islnk is defined
+  register: zshrc_grep
+
+- set_fact:
+    doinst_zshrc: "{{zshrc_grep|skipped or zshrc_grep.rc != 0}}"
+
+- name: config | backing up old ~/.zshrc to ~/.zshrc_old_<date here>
+  shell: cp "{{ ansible_user_dir }}/.zshrc" "{{ansible_user_dir}}/.zshrc_old_`date -I`"
+  when: doinst_zshrc
+
+- name: config | installing ~/.zshrc
+  shell: cp "{{ ozsh__home }}/templates/zshrc.zsh-template" "{{ ansible_user_dir }}/.zshrc"
+  when: doinst_zshrc
+
+- name: processing | determining path to zsh
+  shell: grep '/zsh$' /etc/shells | tail -1
+  changed_when: 0
+  register: zsh_shell_path
+
+# regarding sudo: only way I can avoid it failing due to it wanting to ask the
+# user for his password.
+- name: config | changing your shell to zsh
+  user: name="{{ansible_user_id}}" shell="{{zsh_shell_path.stdout}}"
+  sudo: yes

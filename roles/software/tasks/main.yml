@@ -1,0 +1,7 @@
+- name: install | base software
+  dnf:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - "{{wrk_pkgs}}"
+  sudo: true
