@@ -1,0 +1,6 @@
+---
+- include: cleanup.yml
+  when: font_awesome__state == "absent"
+
+- include: setup.yml
+  when: font_awesome__state == "present"

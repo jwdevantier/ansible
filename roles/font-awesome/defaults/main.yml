@@ -1,0 +1,11 @@
+---
+
+font_awesome__version: 4.4.0
+font_awesome__url: "http://fortawesome.github.io/Font-Awesome/assets/font-awesome-{{font_awesome__version}}.zip"
+font_awesome__pkg_dst: "/tmp/font-awesome-{{font_awesome__version}}.zip"
+
+font_awesome__fonts_dir: "{{ ansible_user_dir }}/.local/share/fonts"
+font_awesome__font_dir: "{{ font_awesome__fonts_dir }}/font-awesome"
+
+# present|absent
+font_awesome__state: present

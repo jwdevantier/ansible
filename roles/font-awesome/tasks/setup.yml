@@ -1,0 +1,30 @@
+---
+
+- stat:
+    path: "{{ font_awesome__pkg_dst }}"
+  register: st_font_awesome_pkg
+
+- name: config | download font awesome
+  get_url:
+    url: "{{ font_awesome__url }}"
+    dest: "{{ font_awesome__pkg_dst }}"
+    mode: 0755
+  when: st_font_awesome_pkg.stat.exists == false
+
+- name: config | ensure fontdir exists
+  file:
+    path: "{{ font_awesome__font_dir }}"
+    state: directory
+    recurse: true
+
+- name: install | extract font-awesome
+  unarchive:
+    src: "{{ font_awesome__pkg_dst }}"
+    dest: "{{ font_awesome__font_dir }}" #=> godev__root
+    copy: no
+    mode: 0755
+  register: unarchive
+
+- name: config | update font cache
+  command: fc-cache -fv
+  when: unarchive|changed
