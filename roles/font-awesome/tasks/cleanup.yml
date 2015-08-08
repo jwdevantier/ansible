@@ -1,1 +1,5 @@
 ---
+- name: cleanup | remove font-awesome
+  file:
+    state: absent
+    path: "{{ font_awesome__font_dir }}"
