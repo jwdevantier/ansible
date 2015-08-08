@@ -1,0 +1,33 @@
+---
+#dconf dump /org/gnome/terminal/
+#dconf load /org/gnome/terminal/ <--- populate from stdin
+
+- name: prep | determining path to zsh
+  shell: grep '/zsh$' /etc/shells | tail -1
+  changed_when: 0
+  register: etc_shells
+
+- set_fact:
+    zsh_shell_path: "{{etc_shells.stdout}}"
+
+- name: prep | ensure temporary dir exists
+  file:
+    state: directory
+    mode: 0700
+    path: "/tmp/ansible/"
+  changed_when: 0
+
+- name: prep | generating gnome-terminal profile
+  template:
+    src: gnome-terminal-profile.j2
+    dest: "/tmp/ansible/gnome-terminal-profile"
+    mode: 0600
+  changed_when: 0
+
+- name: config | adopting gnome-terminal-profile
+  shell: cat /tmp/ansible/gnome-terminal-profile | dconf load /org/gnome/terminal/
+
+- name: prep | cleaning up temporary profile file
+  file:
+    state: absent
+    path: "/tmp/ansible/gnome-terminal-profile"
