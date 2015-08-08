@@ -1,3 +1,4 @@
 ---
 dependencies:
-  - { role: font-awesome }
+  - { role: font-awesome, font_awesome__state: present }
+  - { role: gnome-terminal }
