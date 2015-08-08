@@ -8,15 +8,21 @@
     - group_vars/base/main.yml
     - "group_vars/{{ansible__nodename}}/main.yml"
   roles:
-    - role: oh-my-zsh
+#    - role: oh-my-zsh
+#      sudo: false
+#    - role: godev
+#      sudo: false
+#    - role: font-awesome
+#      sudo: false
+#    - role: i3
+#      sudo: false
+    - role: gnome-terminal
       sudo: false
-    - role: godev
-      sudo: false
-    - role: rpmfusion
-      sudo: yes
-    - role: chrome
-      sudo: yes
-    - role: spotify
-      sudo: yes
-    - role: software
-      sudo: yes
+#    - role: rpmfusion
+#      sudo: yes
+#    - role: chrome
+#      sudo: yes
+#    - role: spotify
+#      sudo: yes
+#    - role: software
+#      sudo: yes
