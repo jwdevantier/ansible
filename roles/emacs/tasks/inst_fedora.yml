@@ -1,0 +1,7 @@
+---
+
+- name: fedora | install emacs
+  dnf:
+    state: present
+    name: emacs
+  sudo: yes

@@ -1,0 +1,11 @@
+---
+
+# Will also rely on this for removal
+- include: structure.yml
+
+#Yea... I know, right ?!
+- include: cleanup.yml
+  when: emacs__state == "absent"
+
+- include: setup.yml
+  when: emacs__state == "present"

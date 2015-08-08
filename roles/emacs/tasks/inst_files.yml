@@ -1,0 +1,29 @@
+---
+# Uses the variables set in 'structure.yml' to install the relevant files.
+
+- name: prep | create directories
+  file:
+    path: "{{ inst_root }}/{{ item }}"
+    state: directory
+    recurse: true
+  with_items:
+    - "{{ template_dirs }}"
+    - "{{ file_dirs }}"
+
+- debug: var="{{template_paths}}"
+
+- name: install | install templated files
+  template:
+    src: "{{ file_root }}/{{ item }}"
+    dest: "{{ inst_root }}/{{ item.rstrip('.j2') }}"
+    mode: 0700
+  with_items:
+    - "{{ template_paths }}"
+
+- name: install | install regular files
+  copy:
+    src: "{{ tmpl_root }}/{{ item }}"
+    dest: "{{ inst_root }}/{{ item }}"
+    mode: 0700
+  with_items:
+    - "{{ file_paths }}"

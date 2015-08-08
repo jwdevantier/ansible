@@ -1,0 +1,6 @@
+---
+- name: fedora | remove emacs
+  dnf:
+    name: emacs
+    state: absent
+  sudo: yes

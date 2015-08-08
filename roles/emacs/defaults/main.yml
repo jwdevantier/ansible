@@ -1,0 +1,15 @@
+---
+# Directories within 'templates'/'files' whose
+# structure are exactly replicated
+tmpl_root: "user_dir"
+file_root: "user_dir"
+# The root directory into which the structure and files
+# of '{tmpl,file}_root' will be installed
+inst_root: "{{ ansible_user_dir }}"
+
+# absent|present
+emacs__state: present
+
+# Will nuke the emacs config itself which you may have altered
+# --be *extremely* careful!
+emacs__nuke: false

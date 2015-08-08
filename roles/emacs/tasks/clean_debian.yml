@@ -1,0 +1,6 @@
+---
+- name: debian | remove emacs
+  apt:
+    state: absent
+    name: emacs
+  sudo: yes

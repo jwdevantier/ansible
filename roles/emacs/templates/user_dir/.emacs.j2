@@ -1,0 +1,676 @@
+; Messages from this are tucked in the '*Messages*' buffer (M-x switch-to-buffer *Messages*)
+
+; M-x ielm   <-- interactive elisp buffer, great for experimentation
+; M-x describe-variable  <--- type name of variable and get its desc + value
+
+;; TODO
+;;
+;; 1) double-check that all pages are installed, e.g. I refer to yasnippet
+;;    still
+
+
+;; Required system-level packages:
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; base -- global (gnu global tags/ggtags)
+;; c -- clang
+;; python -- virtualenv, jedi, pip
+;; go -- golang, gocode (ubuntu)
+;;       go get -u code.google.com/p/rog-go/exp/cmd/godef
+;;
+;; Golang, Fedora:
+;;  dnf install golang-pkg-bin-linux-amd64
+;;  go get -u github.com/nsf/gocode
+;;  go get -u code.google.com/p/rog-go/exp/cmd/godef
+;; js -- npm, tern (node module)
+
+(message "[.EMACS]...")
+
+; Ensure emacs is recent enough...
+(when (< emacs-major-version 24)
+	(error "Emacs is too old, aborting! -- patch your sh!t")
+)
+
+;; Package-related
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; load packages from '~/.emacs.d/packages'
+(add-to-list 'load-path "~/.emacs.d/packages/")
+
+(defun my::pkg-set-archives ()
+  (require 'package)
+  (package-initialize)
+  (add-to-list 'package-archives
+    '("melpa" . "http://melpa.milkbox.net/packages/") t)
+)
+
+(defun my::pkg-install (pkglist)
+  (dolist (p pkglist)
+    (when (not (package-installed-p p))
+      ;refresh package list if necessary
+      (unless (boundp 'pkglist-refreshed)
+        (progn
+          (message "Missing packages, refreshing package list !")
+          (package-refresh-contents)
+          (setq pkglist-refreshed t)
+        )
+      )
+      (package-install p)
+    )
+  )
+)
+
+;holds list of packages to install
+(defvar my::_pkglist '())
+;holds the string equivalent of a feature tag
+(defvar my::_features '())
+;holds the callbacks added as a consequence of calling 'my::if-feature'
+(defvar my::_f-callbacks '())
+
+;add a set of packages to install and mark that a feature has been enabled
+(defun my::pkg-require (feature pkgs)
+  (add-to-list 'my::_features feature)
+  (dolist (pkg pkgs)
+    (add-to-list 'my::_pkglist pkg)
+  )
+)
+
+;run all callbacks
+(defun my::run-feature-callbacks ()
+  ;TODO -- reverse list to get the right order again
+  (dolist (callback my::_f-callbacks)
+    (funcall callback)
+  )
+)
+
+;add callback if feature is matching
+(defun my::if-enabled (feature callback)
+  (if (member feature my::_features)
+    (add-to-list 'my::_f-callbacks callback))
+)
+
+; Initialise package management package
+(my::pkg-set-archives)
+
+;; Package installation
+(my::pkg-require "base"
+  '(
+     material-theme smyx-theme powerline ggtags move-text fill-column-indicator auto-complete
+  )
+)
+;(my::pkg-require "c" '(auto-complete-clang))
+(my::pkg-require "python" '(python-environment jedi virtualenvwrapper))
+(my::pkg-require "go" '(go-mode go-autocomplete))
+(my::pkg-require "ruby" '(enh-ruby-mode robe rvm yaml-mode))
+(my::pkg-require "js" '(tern tern-auto-complete web-mode flycheck))
+;(my::pkg-require "php" '(web-mode flymake-easy flymake-php php-mode))
+(my::pkg-require "cl" '(slime))
+(my::pkg-require "clojure" '(clojure-mode cider ac-cider))
+(my::pkg-require "theming" '(rainbow-mode))
+(my::pkg-install my::_pkglist) ; actually install packages
+
+
+;;; [Theming :)]
+;(have to run before highlight font face customisations or else it'll
+;override it)
+(load-theme 'smyx t)
+;(load-theme 'tango t)
+; M-x 'set-default-font' - Tab twice to get a list
+; describe-font - to read back the selection, copy 'full name'
+;   for reasons of readability.
+;(set-default-font "Inconsolata-11")
+(set-default-font "Source Code Pro Semibold-10")
+
+;Get a vim-like powerline
+(require 'powerline)
+(powerline-default-theme)
+
+
+;; Customising Standard Settings
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;don't show a toolbar (wrapped in if to avoid error in console-mode!)
+(if window-system
+    (tool-bar-mode -1)
+)
+(menu-bar-mode -1)                               ;don't show the menubar
+(setq inhibit-startup-screen t)                  ;hide welcome screen
+(fset 'yes-or-no-p 'y-or-n-p)                    ;changes yes/no prompts to y/n
+(show-paren-mode 1)                              ;highlight matching parentheses
+
+;automatically reload files when they're changed on disk.
+(global-auto-revert-mode t)
+
+;grave accent + tilde required this (2x key + space)
+(require 'iso-transl)
+
+;C-Z would suspend emacs & royally F-up my day - disable it!
+(global-unset-key (kbd "C-z"))
+
+;; Highlight *.zsh files
+(add-to-list 'auto-mode-alist '("\\.zsh\\'" . sh-mode))
+
+
+;Map <Alt>+{arrow-key} to navigate between windows
+;(multiple buffers on screen)
+(global-set-key [M-up] 'windmove-up)
+(global-set-key [M-down] 'windmove-down)
+(global-set-key [M-left] 'windmove-left)
+(global-set-key [M-right] 'windmove-right)
+
+
+;; Line highlighting
+(global-linum-mode t)                                ;line numbers
+(global-hl-line-mode t)                              ;highlight current line
+(set-face-attribute hl-line-face nil :underline nil) ;don't underline highlight
+;don't prompt when making non-existent buffers/files
+(setq confirm-nonexistent-file-or-buffer nil)
+
+
+;; Highlight whitespace
+(require 'whitespace)
+(setq whitespace-style '(spaces tabs space-mark tab-mark))
+(add-hook 'c-mode-hook 'whitespace-mode)
+(add-hook 'python-mode-hook 'whitespace-mode)
+
+
+;; Base Settings (auto-complete, ggtags, ido, etc)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; [Auto-complete config]
+;; auto-completion w. clang :)
+(require 'auto-complete-config)
+
+(setq ac-auto-start nil)
+(setq ac-quick-help-delay 0.5)
+;; (ac-set-trigger-key "TAB")
+(define-key ac-mode-map  [(control tab)] 'auto-complete)
+(defun my-ac-config ()
+  (setq-default ac-sources '(ac-source-abbrev ac-source-dictionary ac-source-words-in-same-mode-buffers))
+  (add-hook 'emacs-lisp-mode-hook 'ac-emacs-lisp-mode-setup)
+  (add-hook 'auto-complete-mode-hook 'ac-common-setup)
+  (global-auto-complete-mode t))
+
+
+;;; [ggtags config]
+;; purpose: code navigation (tagging)
+
+; M- .	-- go to definition
+; M- ,	-- abort search (goes back to where the search started, NESTED!!)
+; M- -	-- find references to identifier
+;  (going through matches)
+;    M-,<   -- change to first match
+;    M-,>   -- change to last match
+;    M-,n   -- change to next match
+;    M-,p   -- change to previous match
+
+;Next 3 functions collectively allow incremental GTAGS updating
+(defun gtags-root-dir ()
+  "returns GTAGS root dir or nil if it doesn't exist"
+  (with-temp-buffer
+    (if (zerop (call-process "global" nil t nil "-pr"))
+	(buffer-substring (point-min) (1- (point-max)))
+    )
+  )
+)
+(defun gtags-update-hook ()
+  "if GTAGS root dir has been found, do incremental
+  updates of tag files when executed (install as
+  'after-save-hook' when 'ggtags-mode'!)"
+  (call-process "global" nil nil nil "-u")
+)
+
+
+;Override GGTags keybinds
+(add-hook 'ggtags-mode-hook
+  (lambda ()
+    (message "ggtags mode hook run...")
+    (define-key ggtags-mode-map (kbd "M-\-") 'ggtags-find-reference)
+    (define-key ggtags-mode-map (kbd "M-\,") 'pop-tag-mark)
+  )
+)
+
+;;; [ido config]
+;; buffer management
+
+; C-x b then:
+; - start typing the name of the buffer to autocomplete (fuzzy matching)
+(require 'ido)
+(ido-mode t)
+; don't prompt whenever we're creating a new buffer
+;(we're really, "opening" a buffer with a non-existent name)
+(setq ido-create-new-buffer 'always)
+
+;;; [Move text]
+; allows moving lines/regions up and down
+; [M-S-up] => move-text-up
+; [M-S-down] => move-text-down
+(global-set-key [C-up] 'move-text-up)
+(global-set-key [C-down] 'move-text-down)
+
+;;; [Fill column indicator]
+;; allows showing a line indicating 80 chars of width
+; !! If enabled, graphical errors will occur. Test expand in customize-create-theme
+;(require 'fill-column-indicator)
+;(define-globalized-minor-mode
+;   global-fci-mode fci-mode (lambda () (fci-mode 1)))
+;(global-fci-mode t)
+;(setq-default fci-rule-column 80)
+
+
+;; C Settings
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun configure-c ()
+  (require 'auto-complete-clang)
+
+  ;; Forcibly added a few additional include directories for
+  ;; auto-completion suggestions
+  (defun my-ac-cc-mode-setup ()
+    (setq ac-sources (append '(ac-source-clang ac-source-yasnippet) ac-sources))
+    (setq ac-clang-flags
+      (mapcar (lambda (item)(concat "-I" item))
+        (split-string
+	  "
+          /home/pseudonymous/repos/qemu-nvme/include/
+          /usr/include/
+          "
+        )
+      )
+    )
+  )
+
+  ;;enable ggtags for C and ensure 'gtags-update-hook is run
+  ;;(which ensures saved files are re-tagged to keep indices up to date)
+  (add-hook 'c-mode-common-hook
+    (lambda ()
+      (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
+        (ggtags-mode 1)
+        (add-hook 'after-save-hook #'gtags-update-hook)
+      )
+    )
+  )
+  ;Include the indentation rules used for the linux kernel and QEMU
+  (require 'c-indent-qemu)
+  (require 'c-indent-linux)
+
+  ;automatically indent newlines in C-mode
+  (add-hook 'c-mode-common-hook '(lambda ()
+    (local-set-key (kbd "RET") 'newline-and-indent)))
+
+  (message "=>C configured..")
+)
+(my::if-enabled "c" 'configure-c)
+
+;; Python Settings
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun configure-python ()
+  ; python code completion
+  ;remember to run 'M-x jedi:install-server' after install
+  ; -- remember to have 'virtualenv' installed before doing so!
+  (require 'jedi)
+  (setq jedi:setup-keys nil)
+  (setq jedi:tooltip-method nil)
+  (autoload 'jedi:setup "jedi" nil t)
+  (setq jedi:complete-on-dot t)
+  (add-hook 'python-mode-hook 'jedi:setup)
+
+  ; write func to push goto's to a stack for popping
+  ; (basically ggtags-style lookup)
+  ; thanks to "http://txt.arboreus.com/2013/02/21/
+  ; jedi.el-jump-to-definition-and-back.html"
+  (defvar jedi:goto-stack '())
+  (defun jedi:jump-to-definition ()
+    (interactive)
+    (add-to-list 'jedi:goto-stack
+                 (list (buffer-name) (point)))
+    (jedi:goto-definition))
+  (defun jedi:jump-back ()
+    (interactive)
+    (let ((p (pop jedi:goto-stack)))
+      (if p (progn
+              (switch-to-buffer (nth 0 p))
+              (goto-char (nth 1 p))))))
+
+  ; Hack -- use virtualenv
+  ;; Caveat:: must use same python version as jedi, otherwise there's gonna
+  ;; be a problem.
+  ;;;(defun my-jedi-setup (venv_path)
+  (defun my-jedi-setup ()
+     '(lambda ()
+         (local-set-key (kbd "M-\.") 'jedi:jump-to-definition)
+         (local-set-key (kbd "M-\,") 'jedi:jump-back)
+         (local-set-key (kbd "M-\-") 'jedi:show-doc)
+         (local-set-key (kbd "C-<tab>") 'jedi:complete)
+     )
+  )
+  (add-hook 'python-mode-hook 'my-jedi-setup)
+
+  (defun my:swap-venv (venv)
+    (interactive (list (read-directory-name "V-ENV Path: ")) )
+
+    ;; relative paths (~/code...) won't work -- expand the input path
+    (let ((venv-path (expand-file-name venv)))
+      (setq venv-location venv-path)
+      (setq jedi:server-args
+        (list "--virtual-env" venv-path)
+      )
+      (let ((pybin (concat (file-name-as-directory (concat (file-name-as-directory venv-path) "bin")) "python")))
+        ;(message "pybin '%s'" pybin)
+        (setq jedi:server-command (list pybin jedi:server-script))
+      )
+    )
+
+    ;; allow interpreting func calls using prefixes
+    (let ((current-prefix-arg t))
+      (jedi:setup)
+      (jedi:stop-server)
+      (jedi:start-server)
+    )
+    ;; be informative
+    (message "venv switched to '%s'" venv)
+  )
+  (message "=>Python configured...")
+)
+(my::if-enabled "python" 'configure-python)
+
+
+;; Google Go Settings
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun configure-go ()
+  (require 'go-autocomplete)
+  (require 'auto-complete-config)
+  (ac-config-default)
+  (add-hook 'go-mode-hook (lambda ()
+    ;GOPATH specifies where to look for projects outside the core (GOROOT) install
+    ;  also the dir into which packages gotten via 'go get -u <url>' are installed
+    (setenv "GOPATH" (concat (getenv "HOME") "/go"))
+    (setq exec-path (append exec-path (list (concat (getenv "GOPATH") "/bin"))))
+
+    ;M-* to jump back, apparently, -- how to change ?
+    ;jump to definition
+    (local-set-key (kbd "M-\.") 'godef-jump)
+    (local-set-key (kbd "M-\,") 'pop-global-mark)
+    ;show documentation
+    (local-set-key (kbd "M-\-") 'godef-describe)
+    ;go to imports - placing cursor after last import
+    (local-set-key (kbd "M-\i") 'go-goto-imports)
+    ;remove unused imports
+    (local-set-key (kbd "C-M-<tab>") 'go-remove-unused-imports)
+    (message (concat "GOPATH is " (getenv "GOPATH")))
+    (message (concat "PATH is " (getenv "PATH")))
+
+    (defun golang-before-save-hook ()
+      (when (eq major-mode 'go-mode)
+        (gofmt-before-save)
+      )
+    )
+    (add-hook 'before-save-hook #'golang-before-save-hook)
+
+    ;tab width =>4 (local var to not have it be global)
+    (make-local-variable 'tab-width)
+    (setq tab-width 4 indent-tabs-mode 1)
+  ))
+  (message "=>Go configured...")
+)
+(my::if-enabled "go" 'configure-go)
+
+
+;; Ruby Settings
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun configure-ruby ()
+  (require 'robe)
+  (require 'enh-ruby-mode)
+
+  ;Prerequisites
+  ; * Ruby install with pry & bundler
+
+  ;NOTE: this setup will use whichever rvm version & gemset specified by the first
+  ;Gemfile that it finds.
+  ;-
+  ;The gemset MUST contain 'pry' & 'bundler' otherwise loading will fail, sometimes
+  ;you'll see output in *Messages*, other times it will simply state 'Robe launch failed'
+
+  ;RVM Install guide
+  ;----------------------------
+  ;curl -sSL https://rvm.io/mpapis.asc | gpg2 --import -
+  ;curl -sSL https://get.rvm.io | bash -s stable --ruby
+  ;Add to bottom of ~/.zshrc :
+  ;  export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
+  ;  source ~/.rvm/scripts/rvm
+
+  ;Setting up ruby env with rvm
+  ;----------------------------
+  ;rvm list known                   ;known ruby versions
+  ;rvm list                         ; list locally installed ruby versions
+  ;rvm install ruby-2.2             ; install latest 2.2 version
+  ;rvm --default use 2.2            ; use v2.2 and set it as future default
+  ;rvm gemset create emacsdev
+  ;rvm use 2.2@emacsdev --default   ; use MRI 2.2 w 'emacsdev' gemset as default
+  ;rvm docs generate-ri             ; build docs
+  ;gem install pry                  ; install gem 'pry' (needed for robe)
+
+  ;Point this to a copy of ruby +1.9.2 (with pry gem)
+  (setq enh-ruby-program "~/.rvm/rubies/ruby-2.2.1/bin/ruby")
+
+  ;Ensure various ruby files use enh-ruby-mode
+  (autoload 'enh-ruby-mode "enh-ruby-mode" "Major mode for ruby files" t)
+  (add-to-list 'auto-mode-alist '("\\.rb$" . enh-ruby-mode))
+  (add-to-list 'auto-mode-alist '("\\.rake$" . enh-ruby-mode))
+  (add-to-list 'auto-mode-alist '("Rakefile$" . enh-ruby-mode))
+  (add-to-list 'auto-mode-alist '("\\.gemspec$" . enh-ruby-mode))
+  (add-to-list 'auto-mode-alist '("\\.ru$" . enh-ruby-mode))
+  (add-to-list 'auto-mode-alist '("Gemfile$" . enh-ruby-mode))
+
+  (add-to-list 'interpreter-mode-alist '("ruby" . enh-ruby-mode))
+
+  ;(setq enh-ruby-bounce-deep-indent t)
+  ;setq enh-ruby-hanging-brace-indent-level 2)
+
+  ;ROBE - adv introspection (jump to method def, get method docs, completion)
+  ; https://github.com/dgutov/robe
+
+  ;Add this to the Gemfile of the ruby project dir:
+  ;--
+  ;#ruby=ruby-2.2.1
+  ;#ruby-gemset=emacsdev
+  ;gem "pry"
+  ;--
+
+  ; Show autocomplete menu automatically (otherwise use ac shortcut to trigger)
+  (setq ac-auto-start t)
+
+  ; Trigger on loading 'enh-ruby-mode-hook'
+  (add-hook 'enh-ruby-mode-hook
+    (lambda()
+      (robe-mode)
+      (save-excursion (robe-start))
+      (ac-robe-setup)
+      (auto-complete-mode)
+
+      (setq completion-at-point-functions '(auto-complete))
+  ))
+
+  ;
+  ;(setq ac-auto-start t)
+  ;(add-hook 'robe-mode-hook
+  ;  (lambda()
+  ;    (add-to-list 'ac-sources 'ac-source-robe)
+  ;    (setq completion-at-point-functions '(auto-complete))
+  ;  )
+  ;)
+  ;(add-hook 'robe-mode-hook 'ac-robe-setup)
+  ;(add-hook 'enh-ruby-mode-hook 'auto-complete-mode)
+
+  ;Ensure rvm activates the proper Ruby version BEFORE robe actually starts
+  (defadvice inf-ruby-console-auto (before activate-rvm-for-robe activate)
+  (rvm-activate-corresponding-ruby))
+
+  ;Still broken.. need to 'robe-start'
+  (message "=>ruby configured...")
+)
+(my::if-enabled "ruby" 'configure-ruby)
+
+(defun configure-js ()
+  ; Syntax checking for JSX
+  ; ['emacs' => (flycheck), 'node' => (jsxhint)]
+  ; Auto completion
+  ; ['emacs' => (tern, tern-mode), 'node' => (tern) ]
+
+  ; To install a package globally via node: npm install -g <pkg>
+
+  ; To enable autocompletion on a local project AND ITS NODE MODULE DEPENDENCIES
+  ; drop a file '.tern-project' in the directory root with the following contents:
+  ; --
+  ; {
+  ;   "plugins": {
+  ;     "node": {}
+  ;   }
+  ; }
+
+  ;syntax checking
+  ; npm install -g jsxhint
+  (require 'auto-complete-config)
+  (require 'tern)
+  (require 'flycheck)
+
+  ; Web-mode config
+  ; ------------------------------
+  (add-hook 'web-mode-hook (lambda()
+    (tern-mode t)
+
+    ; Only indent by 2 spaces
+    (setq web-mode-markup-indent-offset 2)
+    (setq web-mode-code-indent-offset 2)
+    (setq web-mode-css-indent-offset 2)
+
+    ; disable automatic insertion of quotes after '=' in attributes
+    ; once you're writing JSX files, you'll quickly know why.
+    (setq web-mode-enable-auto-quoting nil)
+  ))
+  ;use web-mode for html
+  (add-to-list 'auto-mode-alist '("\\.html$" . web-mode))
+
+  ; Activate web-mode for jsx files
+  ; -------------------------------
+  (add-to-list 'auto-mode-alist '("\\.jsx$" . web-mode))
+  (defadvice web-mode-highlight-part (around tweak-jsx activate)
+    (if (equal web-mode-content-type "jsx")
+      (let ((web-mode-enable-part-face nil)) ad-do-it)
+      ad-do-it
+    )
+  )
+
+  ; Enable tern-mode in js- & web-mode
+  ; ----------------------------------
+  (add-hook 'js-mode-hook (lambda()
+    (tern-mode t)
+  ))
+  (add-hook 'jsx-mode-hook (lambda ()
+    (tern-mode t)
+  ))
+
+  ; Syntax-checking for JSX (in web-mode)
+  ; -------------------------------------
+  (flycheck-define-checker jsxhint-checker
+    "A JSX syntax and style checker based on JSXHint."
+    :command ("jsxhint" source)
+    :error-patterns
+    (
+      (error line-start (1+ nonl) ": line " line ", col " column ", " (message) line-end)
+    )
+    :modes (web-mode)
+  )
+  (add-hook 'web-mode-hook
+    (lambda ()
+      (when (equal web-mode-content-type "jsx")
+        ;; enable flycheck
+        (flycheck-select-checker 'jsxhint-checker)
+        (flycheck-mode)
+      )
+    )
+  )
+
+  ; Auto-completion for JSX
+  ; -----------------------
+  (add-hook 'jsx-mode-hook
+    (lambda ()
+      (auto-complete-mode 1)
+    )
+  )
+
+  ; Set JSON indent to 2 spaces
+  ; ---------------------------
+  (add-hook 'json-mode-hook
+    (lambda ()
+      (make-local-variable 'js-indent-level)
+      (setq js-indent-level 2)
+    )
+  )
+
+  (message "JavaScript configured...")
+)
+(my::if-enabled "js" 'configure-js)
+
+;; PHP Settings
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun configure-php ()
+  ;(require 'flymake-php)
+  (require 'hack-mode)
+  ;(add-to-list 'auto-mode-alist '("\\.php$" . on-php-hack))
+  (defun on-hack-mode ()
+    ;(flymake-php-load)
+    (ggtags-mode 1)
+    ;(add-hook 'after-save-hook #'gtags-update-hook)
+    (setq auto-complete-mode t)
+    (message "HACK MODE INITIATED .... ")
+  )
+  (add-hook 'hack-mode-hook 'on-hack-mode)
+  (add-to-list 'auto-mode-alist '("\\.php$" . hack-mode))
+
+  (message "=>PHP configured...")
+)
+(my::if-enabled "php" 'configure-php)
+
+;; Common Lisp (Specifically SBCL)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun configure-cl ()
+  (require 'slime)
+  (add-hook 'lisp-mode-hook (lambda ()
+    (slime-mode t)
+    (unless (slime-connected-p) (save-excursion (slime)))))
+  (add-hook 'inferior-lisp-mode-hook (lambda ()
+    (inferior-slime-mode t)))
+  (setq inferior-lisp-program "/usr/bin/sbcl")
+  (message "=> (Steel Bank) Common Lisp configured...")
+)
+(my::if-enabled "cl" 'configure-cl)
+
+;; Clojure
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun configure-clojure ()
+  (message "=> Clojure Configured")
+)
+(my::if-enabled "clojure" 'configure-clojure)
+
+;;Theming pkg configuration
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun configure-theming ()
+  (message "=>Theming pkg set configured...")
+)
+(my::if-enabled "theming" 'configure-theming)
+
+
+(my::run-feature-callbacks)
+(message "[.EMACS] ALL DONE :)")
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(ansi-color-faces-vector
+   [default bold shadow italic underline bold bold-italic bold])
+ '(custom-safe-themes
+   (quote
+    ("d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8288b9b453cdd2398339a9fd0cec94105bc5ca79b86695bd7bf0381b1fbe8147" "9b402e9e8f62024b2e7f516465b63a4927028a7055392290600b776e4a5b9905" "1c57936ffb459ad3de4f2abbc39ef29bfb109eade28405fa72734df1bc252c13" "f29b3cc12ef14aa00a415e65a9ce4936c25cd8ffb85d295b803110754d7ebf88" "e8002385fc9bb928b0bd6f99b4a461a34c8a3f246a1f774c8427c240e7bec1f0" "4ff23437b3166eeb7ca9fa026b2b030bba7c0dfdc1ff94df14dfb1bcaee56c78" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "3dafeadb813a33031848dfebfa0928e37e7a3c18efefa10f3e9f48d1993598d3" "f2c10e91b66e20bd46289d9a2695fb61e54ac311adf588c34f53df92c203e3a1" "2e5ff9b264e393938094967f88b456e566e209354abac101084a470274b402ed" "bfbd0c1b71074933d34e01da24356ceb55bd7957c7db3ffa9d4e8c61d6c61402" "5bddd992f468ea0aa70fd5629534c036fd66ba1a2eae47daa8d52c835178ed69" "226494d45f5540c3a18237117661ceae8b095c0b308fdbd2fc2a6b073fe9b916" "7bde52fdac7ac54d00f3d4c559f2f7aa899311655e7eb20ec5491f3b5c533fe8" default))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )

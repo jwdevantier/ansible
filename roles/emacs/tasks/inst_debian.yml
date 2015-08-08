@@ -1,0 +1,8 @@
+---
+- name: debian | install emacs
+  apt:
+    state: present
+    name: emacs
+    update_cache: true
+    cache_valid: 3600
+  sudo: yes

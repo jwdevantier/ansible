@@ -1,0 +1,36 @@
+---
+# Determine path structure
+
+- name: prep | determine template path structure
+  command: find . -type d
+  args:
+    chdir: "{{ role_path }}/templates/{{ tmpl_root }}"
+  register: find_template_dirs
+  changed_when: 0
+
+- name: prep | determine file path structure
+  command: find . -type d
+  args:
+    chdir: "{{ role_path }}/files/{{ file_root }}"
+  register: find_file_dirs
+  changed_when: 0
+
+- name: prep | find template files
+  command: find . -iname '*.j2' -type f
+  args:
+    chdir: "{{ role_path }}/templates/{{ tmpl_root }}"
+  register: find_template_paths
+  changed_when: 0
+
+- name: prep | find regular files
+  command: find . -type f
+  args:
+    chdir: "{{ role_path }}/files/{{ file_root }}"
+  register: find_file_paths
+  changed_when: 0
+
+- set_fact:
+    template_dirs: "{{ find_template_dirs.stdout_lines }}"
+    file_dirs: "{{ find_file_dirs.stdout_lines }}"
+    template_paths: "{{ find_template_paths.stdout_lines }}"
+    file_paths: "{{ find_file_paths.stdout_lines }}"
