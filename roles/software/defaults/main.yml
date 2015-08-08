@@ -36,6 +36,6 @@ wrk_pkgs:
   - NetworkManager-pptp-gnome
   - NetworkManager-vpnc-gnome
   - NetworkManager-wifi
+  - network-manager-applet
   - pavucontrol
-
-# still need to go get godef, gocode & gb
+  - irssi
