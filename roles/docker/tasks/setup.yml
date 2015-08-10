@@ -1,0 +1,9 @@
+---
+- include: inst_fedora.yml
+  when: "{{ansible_distribution|lower == 'fedora'}}"
+
+- include: inst_debian.yml
+  when: "{{ansible_os_family|lower == 'debian'}}"
+
+- name: config | enable docker service
+  service: name=docker enabled=true state=restarted

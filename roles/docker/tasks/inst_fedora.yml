@@ -1,0 +1,14 @@
+---
+
+- name: fedora | add docker repo
+  template:
+    src: fedora/docker.repo.j2
+    dest: /etc/yum.repos.d/docker.repo
+    owner: root
+    group: root
+    mode: 0644
+
+- name: fedora | install docker
+  dnf:
+    name: docker-engine
+    state: present

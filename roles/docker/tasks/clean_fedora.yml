@@ -1,0 +1,11 @@
+---
+- name: fedora | remove docker
+  dnf:
+    name: docker-engine
+    state: absent
+  sudo: yes
+
+- name: fedora | remove docker repo
+  file:
+    path: "{{docker__repofile_dst}}"
+    state: absent

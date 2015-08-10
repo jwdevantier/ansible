@@ -1,0 +1,7 @@
+---
+
+- include: cleanup.yml
+  when: docker__state == "absent"
+
+- include: setup.yml
+  when: docker__state == "present"

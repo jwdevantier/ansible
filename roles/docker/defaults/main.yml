@@ -1,0 +1,4 @@
+---
+docker__state: present
+
+docker__repofile_dst: /etc/yum.repos.d/docker.repo
