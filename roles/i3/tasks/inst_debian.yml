@@ -8,4 +8,5 @@
   with_items:
     - i3
     - dmenu
+    - i3lock
   sudo: yes
