@@ -1,0 +1,7 @@
+---
+
+- include: cleanup.yml
+  when: mysql_workbench__state == "absent"
+
+- include: setup.yml
+  when: mysql_workbench__state == "present"

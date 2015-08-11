@@ -1,0 +1,4 @@
+---
+mysql_workbench__state: present
+
+mysql_workbench__repo_pkgver: fc{{ansible_lsb['major_release']}}-5

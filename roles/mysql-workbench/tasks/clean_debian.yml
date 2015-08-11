@@ -1,0 +1,6 @@
+---
+- name: debian | remove software
+  apt:
+    state: absent
+    name: "mysql-workbench"
+  sudo: yes

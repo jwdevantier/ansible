@@ -1,0 +1,13 @@
+---
+
+- name: fedora | install mysql community repo
+  dnf: name={{ item }}
+       state=present
+  with_items:
+    - https://dev.mysql.com/get/mysql-community-release-{{ mysql_workbench__repo_pkgver }}.noarch.rpm
+
+- name: fedora | install mysql-workbench
+  dnf:
+    state: present
+    name: mysql-workbench-community
+  sudo: yes

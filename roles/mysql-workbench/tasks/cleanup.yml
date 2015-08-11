@@ -1,0 +1,7 @@
+---
+
+- include: clean_fedora.yml
+  when: "{{ansible_distribution|lower == 'fedora'}}"
+
+- include: clean_debian.yml
+  when: "{{ansible_os_family|lower == 'debian'}}"

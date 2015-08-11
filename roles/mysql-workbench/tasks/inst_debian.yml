@@ -1,0 +1,8 @@
+---
+- name: debian | install software
+  apt:
+    state: present
+    name: mysql-workbench
+    update_cache: true
+    cache_valid: 3600
+  sudo: yes
