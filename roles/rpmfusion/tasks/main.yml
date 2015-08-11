@@ -1,7 +1,6 @@
 ---
-- name: install the rpmfusion repo packages
-  dnf: name={{ item }}
-       state=present
-  with_items:
-    - http://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-{{ fedora_current }}.noarch.rpm
-    - http://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-{{ fedora_current }}.noarch.rpm
+- include: cleanup.yml
+  when: "{{rpmfusion__state == 'absent' and ansible_distribution|lower == 'fedora'}}"
+
+- include: setup.yml
+  when: "{{rpmfusion__state == 'present' and ansible_distribution|lower == 'fedora'}}"

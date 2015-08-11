@@ -1,0 +1,9 @@
+---
+- name: fedora | remove rpmfusion
+  dnf:
+    name: "{{ item }}"
+    state: absent
+  sudo: yes
+  with_items:
+    - "{{ rpmfusion__free }}"
+    - "{{ rpmfusion__nonfree }}"

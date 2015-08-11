@@ -1,0 +1,6 @@
+---
+#present|absent
+rpmfusion__state: present
+
+rpmfusion__free: rpmfusion-free-release
+rpmfusion__nonfree: rpmfusion-nonfree-release
