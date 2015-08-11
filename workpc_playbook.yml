@@ -15,9 +15,13 @@
 #    - role: font-awesome
 #      sudo: false
 #    - role: i3
+#      sudo: yes
+#    - role: docker
+#      sudo: true
+#    - role: gnome-terminal
 #      sudo: false
-    - role: gnome-terminal
-      sudo: false
+#    - role: emacs
+#      sudo: false
 #    - role: rpmfusion
 #      sudo: yes
 #    - role: chrome
@@ -26,3 +30,5 @@
 #      sudo: yes
 #    - role: software
 #      sudo: yes
+    - role: mysql-workbench
+      sudo: yes
