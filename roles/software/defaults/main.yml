@@ -10,6 +10,7 @@ wrk_pkgs:
   - dmenu
   - emacs
   - nmap-ncat
+  - nmap-frontend
   - clojure
   - python3-virtualenv
   - python-virtualenv
@@ -39,3 +40,4 @@ wrk_pkgs:
   - network-manager-applet
   - pavucontrol
   - irssi
+  - keepass

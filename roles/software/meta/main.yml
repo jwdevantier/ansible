@@ -1,0 +1,3 @@
+---
+dependencies:
+  - { role: rpmfusion, rpmfusion__state: present }
