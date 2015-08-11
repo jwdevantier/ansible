@@ -7,3 +7,12 @@
 
 - name: config | enable docker service
   service: name=docker enabled=true state=restarted
+
+- name: config | docker group
+  group: name=docker state=present
+
+- name: config | add user to docker group
+  user:
+    name: "{{ ansible_user_id }}"
+    groups: docker
+    append: yes

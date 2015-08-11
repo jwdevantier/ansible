@@ -12,3 +12,17 @@
   dnf:
     name: docker-engine
     state: present
+
+- name: fedora | install firewall rule fix
+  copy:
+    src: "fedora/{{ item.name }}"
+    dest: "{{ item.dstdir }}/{{ item.name }}"
+    mode: "{{ item.mode }}"
+    owner: root
+    group: root
+  with_items:
+    - { name: "docker-iptbl-fix", dstdir: "/usr/lib/systemd/scripts/", mode: "0755" }
+    - { name: "docker-iptbl-fix.service", dstdir: "/usr/lib/systemd/system/", mode: "0644" }
+
+- name: fedora | enable docker firewall fix service
+  service: name=docker-iptbl-fix enabled=yes state=restarted

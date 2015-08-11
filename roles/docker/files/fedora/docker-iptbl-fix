@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+FWRULE_TAG="DOCKER-COMM-FIX"
+
+start() {
+    timeout=15
+    while : ; do
+	out=`iptables -S|grep -e "-N DOCKER" 2>&1`
+	ret=$?
+	[[ "$ret" != "0" ]] || break	
+	sleep 1
+	timeout=$(( $timeout - 1))
+	[[ $timeout -ne 0 ]] || exit 1
+    done
+    echo "Installing rules..."
+    iptables -A DOCKER --source 0.0.0.0/0 --destination 172.17.0.0/16 \
+	     -m conntrack --ctstate RELATED,ESTABLISHED \
+	     -m comment --comment "${FWRULE_TAG}" \
+	     -j ACCEPT
+
+    iptables -A DOCKER --destination 0.0.0.0/0 --source 172.17.0.0/16 \
+	     -m comment --comment "${FWRULE_TAG}" \
+	     -j ACCEPT
+}
+
+stop() {
+    iptables -S |grep "${FWRULE_TAG}" | sed 's/^-A//' | while read rule; do
+	iptables -D $rule
+    done
+}
+
+case $1 in
+  start|stop) "$1" ;;
+esac

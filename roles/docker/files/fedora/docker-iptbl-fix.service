@@ -1,0 +1,14 @@
+[Unit]
+Description=Install iptables rules allowing containers to communicate together
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/lib/systemd/scripts/docker-iptbl-fix start
+ExecStop=/usr/lib/systemd/scripts/docker-iptbl-fix stop
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+WantedBy=docker.service
