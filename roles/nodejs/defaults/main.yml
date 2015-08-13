@@ -1,0 +1,24 @@
+---
+#present|absent
+nodejs__state: present
+
+nodejs__pkg_ver: v0.12.7
+nodejs__arch: x64
+nodejs__pkg_name: "node-{{nodejs__pkg_ver}}-linux-{{nodejs__arch}}"
+nodejs__pkg_url: "http://nodejs.org/dist/{{ nodejs__pkg_ver }}/{{ nodejs__pkg_name }}.tar.gz"
+nodejs__pkg_dst: "/tmp/{{nodejs__pkg_name}}.tar.gz"
+
+#Dir forming the ROOT of our install path (e.g. install everything in a dir from there)
+nodejs__dstdir: "{{ global_app_dir }}"
+# Where nodejs itself will be installed
+nodejs__node_root: "{{ nodejs__dstdir }}/nodejs"
+
+# The version tag file will be used to skip the recipe if everything is
+# up-to-date. The tag will be a combination of the version (godev__pkg_ver)
+# and 'godev__role_version'.
+nodejs__version_tag: "{{ nodejs__node_root }}/.version"
+nodejs__role_version: r1
+
+# Env file which makes node & npm available on the command-line
+nodejs__zsh_env_dir: "{{ global_zsh_env_dir }}"
+nodejs__zsh_env_file: "{{ nodejs__zsh_env_dir }}/50-nodejs.zsh"

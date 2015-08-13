@@ -1,0 +1,9 @@
+---
+
+- name: cleanup | remove nodejs directory
+  file:
+    state: absent
+    path: "{{ item }}"
+  with_items:
+    - "{{ nodejs__node_root }}"
+#    - "{{ godev__zsh_env_file }}"

@@ -1,0 +1,38 @@
+---
+# Remove old dir if necessary
+- name: remove old go install
+  file:
+    state: absent
+    path: "{{ nodejs__node_root }}"
+
+- stat:
+    path: "{{ nodejs__pkg_dst }}"
+  register: st_nodejs_pkg
+
+- name: config | download nodejs
+  get_url:
+    url: "{{ nodejs__pkg_url }}"
+    dest: "{{ nodejs__pkg_dst }}"
+    mode: 0755
+  when: st_nodejs_pkg.stat.exists == false
+
+- name: config | ensure dstdir exists
+  file:
+    path: "{{ nodejs__dstdir }}"
+    state: directory
+    recurse: true
+
+- name: install | extract nodejs
+  unarchive:
+    src: "{{ nodejs__pkg_dst }}"
+    dest: "{{ nodejs__dstdir }}"
+    copy: no
+    mode: 0755
+
+- name: config  | move extracted dir
+  shell: "mv {{ nodejs__dstdir }}/{{nodejs__pkg_name}} {{nodejs__node_root}}"
+
+- name: install | install version tag file
+  template:
+    src: nodejs_version_tag.j2
+    dest: "{{ nodejs__version_tag }}"

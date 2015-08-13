@@ -1,0 +1,6 @@
+---
+- include: cleanup.yml
+  when: nodejs__state == "absent"
+
+- include: setup.yml
+  when: nodejs__state == "present"
