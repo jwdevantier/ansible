@@ -1,0 +1,35 @@
+---
+#present|absent
+jvm__state: present
+
+#Note these values from the download page
+# (http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html)
+
+#jdk|jre -- jre should suffice for clojure distribution
+jvm__type: jdk
+# x64|i586
+jvm__arch: x64
+jvm__major: 8
+jvm__minor: 60
+jvm__ver: "{{jvm__major}}u{{jvm__minor}}"
+jvm__build: b27
+jvm__fullver: "{{jvm__ver}}-{{jvm__build}}"
+
+#Will hold the downloaded java sources until cleanup
+jvm__tmp_dir: /tmp/ansible/{{jvm__type}}-{{jvm__fullver}}
+
+#The directory into which we'll extract (& install) java
+jvm__dest_dir: /opt/java/
+
+# Name of the Java directory
+jvm__inst_dirname: "{{jvm__type}}-{{jvm__ver}}-{{jvm__build}}"
+
+# Name of the java directory after extraction (before being renamed to
+# 'jvm__inst_dirname')
+jvm__extracted_dirname: "{{jvm__type}}1.{{jvm__major}}*_{{jvm__minor}}"
+
+# Full path to the root of the new JVM install
+jvm__inst_dir: "{{jvm__dest_dir}}/{{jvm__inst_dirname}}"
+
+#Download url [don't change.]
+jvm__uri: http://download.oracle.com/otn-pub/java/jdk/{{jvm__fullver}}/{{jvm__type}}-{{jvm__ver}}-linux-{{jvm__arch}}.tar.gz

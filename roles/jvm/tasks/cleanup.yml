@@ -1,0 +1,6 @@
+---
+
+- name: Remove Java install
+  file:
+    state: absent
+    path: "{{jvm__inst_dir}}"

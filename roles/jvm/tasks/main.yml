@@ -1,0 +1,7 @@
+---
+# --extra-vars "jvm_state=absent"
+- include: cleanup.yml
+  when: jvm__state == "absent"
+
+- include: setup.yml
+  when: jvm__state == "present"

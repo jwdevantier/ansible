@@ -1,0 +1,59 @@
+---
+- name: determining if java copy is already installed
+  stat:
+    path: "{{jvm__inst_dir}}"
+  register: st_jvm_dir
+
+- debug: msg="{{jvm__inst_dir}} already exists - Remove first before attempting a (re)install"
+  failed_when: 1
+  when: st_jvm_dir is defined and st_jvm_dir.stat.exists
+
+- name: ensuring necessary directories exist
+  file:
+    state: directory
+    path: "{{item.path}}"
+    mode: "{{item.mode}}"
+    recurse: true
+  with_items:
+    - {path: "{{ jvm__tmp_dir }}", mode: "0755" }
+
+- set_fact:
+    java_pkg_fname: "{{jvm__type}}-{{jvm__fullver}}.tgz"
+
+# Using wget because of the need to set a cookie to download java
+- name: Download software
+  shell: "wget -qO {{ item.dest }} {{item.flags}} {{ item.uri }}"
+  args:
+    creates: "{{ item.dest }}"
+  with_items:
+    - { uri: "{{jvm__uri}}", dest: "{{ jvm__tmp_dir }}/{{java_pkg_fname}}", flags: "--header 'Cookie: oraclelicense=accept-securebackup-cookie'"}
+
+- name: extract java
+  unarchive:
+    src: "{{ jvm__tmp_dir }}/{{ java_pkg_fname }}"
+    dest: "{{ jvm__dest_dir }}"
+
+- name: rename java directory
+  shell:  "mv {{jvm__extracted_dirname}} {{jvm__inst_dirname}}"
+  args:
+    chdir: "{{ jvm__dest_dir }}"
+
+- name: install as default java
+  alternatives:
+    name: "{{item.name}}"
+    link: "{{item.link}}"
+    path: "{{item.path}}"
+  with_items:
+    - { name: "java", link: "/usr/bin/java", "path": "{{ jvm__inst_dir }}/bin/java" }
+
+- name: install new java alternative
+  alternatives:
+    name: "{{ item.name }}"
+    path: "{{ item.path }}"
+  with_items:
+    - {name: "java", "path": "{{ jvm__inst_dir }}/bin/java" }
+
+- name: Remove temporary files
+  file:
+    state: absent
+    path: "{{jvm__tmp_dir}}"
