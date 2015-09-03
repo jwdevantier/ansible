@@ -2,16 +2,29 @@
 
 - name: fedora | add docker repo
   template:
-    src: fedora/docker.repo.j2
-    dest: /etc/yum.repos.d/docker.repo
+    src: "fedora/{{item.src}}"
+    dest: "{{item.dst}}"
     owner: root
     group: root
     mode: 0644
+  with_items:
+    - { src: "docker.repo.j2", dst: "/etc/yum.repos.d/docker.repo"}
 
 - name: fedora | install docker
   dnf:
     name: docker-engine
     state: present
+
+#Needed to communicate with insecure registries, among other things
+- name: fedora | template docker sysconfig file
+  template:
+    src: "fedora/{{item.src}}"
+    dest: "{{item.dst}}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - { src: "etc-sysconfig-docker.j2", dst: "/etc/sysconfig/docker" }
 
 - name: fedora | install firewall rule fix
   copy:

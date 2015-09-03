@@ -2,3 +2,7 @@
 docker__state: present
 
 docker__repofile_dst: /etc/yum.repos.d/docker.repo
+
+#Flags to add to the docker daemon. (namely insecure registries)
+docker__syscfg_flags:
+  - "--insecure-registry 192.168.10.2:5000"
