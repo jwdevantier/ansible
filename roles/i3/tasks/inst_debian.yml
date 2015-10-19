@@ -4,7 +4,7 @@
     state: present
     name: "{{ item }}"
     update_cache: true
-    cache_valid: 3600
+    cache_valid_time: 3600
   with_items:
     - i3
     - dmenu

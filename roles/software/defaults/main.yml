@@ -41,3 +41,4 @@ wrk_pkgs:
   - pavucontrol
   - irssi
   - keepass
+  - htop

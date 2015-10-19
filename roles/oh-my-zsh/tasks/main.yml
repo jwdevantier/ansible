@@ -5,7 +5,7 @@
   sudo: yes
 
 - name: debian/ubuntu | install | install ZSH shell
-  apt: name=zsh state=present cache_valid_time=3600 upcate_cache=true
+  apt: name=zsh state=present cache_valid_time=3600 update_cache=true
   when: "{{ansible_os_family|lower == 'debian'}}"
 
 - name: install | clone Oh-My-ZSH
