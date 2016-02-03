@@ -10,9 +10,9 @@ jvm__type: jdk
 # x64|i586
 jvm__arch: x64
 jvm__major: 8
-jvm__minor: 60
+jvm__minor: 71
 jvm__ver: "{{jvm__major}}u{{jvm__minor}}"
-jvm__build: b27
+jvm__build: b15
 jvm__fullver: "{{jvm__ver}}-{{jvm__build}}"
 
 #Will hold the downloaded java sources until cleanup

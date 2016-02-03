@@ -28,6 +28,11 @@
   with_items:
     - { uri: "{{jvm__uri}}", dest: "{{ jvm__tmp_dir }}/{{java_pkg_fname}}", flags: "--header 'Cookie: oraclelicense=accept-securebackup-cookie'"}
 
+- name: create java destination directory
+  file:
+    path: "{{jvm__dest_dir}}"
+    state: directory
+
 - name: extract java
   unarchive:
     src: "{{ jvm__tmp_dir }}/{{ java_pkg_fname }}"
