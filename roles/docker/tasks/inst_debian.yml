@@ -1,1 +1,29 @@
 ---
+- name: ensure apt speaks https
+  apt:
+    pkg: apt-transport-https
+    state: installed
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: add docker apt key
+  apt_key:
+    keyserver: p80.pool.sks-keyservers.net
+    id: 58118E89F3A912897C070ADBF76221572C52609D
+    state: present
+
+
+- debug: msg="ansible_distribution - {{ansible_distribution|lower}}"
+- debug: msg="ansible_distribution_release - {{ansible_distribution_release|lower}}"
+
+- name: add docker repository
+  apt_repository:
+    repo: "deb https://apt.dockerproject.org/repo {{ ansible_distribution|lower }}-{{ ansible_distribution_release|lower }} main"
+    update_cache: yes
+    state: present
+
+- name: install docker
+  apt:
+    pkg: docker-engine
+    state: installed
+    update_cache: true
