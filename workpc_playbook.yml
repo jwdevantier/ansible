@@ -6,7 +6,7 @@
   vars_files:
     - group_vars/local/main.yml
     - group_vars/base/main.yml
-    - "group_vars/{{ansible__nodename}}/main.yml"
+#    - "group_vars/{{ansible__nodename}}/main.yml"
   roles:
 #    - role: oh-my-zsh
 #      sudo: false
@@ -14,9 +14,19 @@
 #      sudo: false
 #    - role: font-awesome
 #      sudo: false
-#    - role: i3
-#      sudo: yes
+#    - role: font-hack
+#      sudo: false
+#    - role: font-source-code-pro
+#      sudo: false
+    - role: i3
+      sudo: yes
 #    - role: docker
+#      sudo: true
+#    - role: virtualbox
+#      sudo: true
+#    - role: nodejs
+#      sudo: false
+#    - role: jvm
 #      sudo: true
 #    - role: gnome-terminal
 #      sudo: false
@@ -30,5 +40,7 @@
 #      sudo: yes
 #    - role: software
 #      sudo: yes
-    - role: mysql-workbench
-      sudo: yes
+#    - role: racket
+#      sudo: yes
+#    - role: mysql-workbench
+#      sudo: yes
