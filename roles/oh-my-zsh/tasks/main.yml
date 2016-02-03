@@ -7,6 +7,7 @@
 - name: debian/ubuntu | install | install ZSH shell
   apt: name=zsh state=present cache_valid_time=3600 update_cache=true
   when: "{{ansible_os_family|lower == 'debian'}}"
+  sudo: yes
 
 - name: install | clone Oh-My-ZSH
   git:
@@ -35,6 +36,8 @@
 - stat: path="{{ ozsh__rc_dist }}"
   register: zshrc_st
 
+###- debug: msg="next cmd - {{ 'grep ' +  ozsh__rc_grep_key + ' ' + ozsh__rc }}"
+
 - name: processing | determining if ~/.zshrc is from this role
   shell: "{{ 'grep ' + ozsh__rc_grep_key + ' ' + ozsh__rc }}"
   failed_when: 0
@@ -42,12 +45,19 @@
   when: zshrc_st.stat.islnk is defined
   register: zshrc_grep
 
-- set_fact:
-    do_backup_zshrc: "{{zshrc_grep is defined and zshrc_grep.skipped|default(false) == false and zshrc_grep.rc != 0}}"
+###- debug: msg="grep res - {{ zshrc_grep }}"
+
+###- set_fact:
+###    do_backup_zshrc: "{{zshrc_grep is defined and zshrc_grep.skipped|default(false) == false and zshrc_grep.rc != 0}}"
+
+###- debug: msg="{{do_backup_zshrc}} lol"
+
+- stat: path="{{ ozsh__rc }}"
+  register: ozsh__rc_stat
 
 - name: config | appending '.old.<date here>' to old .zshrc file
   shell: cp "{{ ozsh__rc }}" "{{ ozsh__rc }}.old.`date -I`"
-  when: do_backup_zshrc
+  when: ozsh__rc_stat.stat.exists == True
 
 - name: config | create .zshcfg.dist directory
   file:
