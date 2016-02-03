@@ -13,9 +13,10 @@
 - name: prep | ensure temporary dir exists
   file:
     state: directory
-    mode: 0700
+    mode: 0777
     path: "/tmp/ansible/"
   changed_when: 0
+  sudo: yes
 
 - name: prep | generating gnome-terminal profile
   template:
