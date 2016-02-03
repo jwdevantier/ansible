@@ -8,8 +8,10 @@
 # Install i3blocks (if necessary)
 - stat: path=/usr/local/bin/i3blocks
   register: st_i3blocks
+  sudo: no
 - include: inst_i3blocks.yml
   when: not st_i3blocks.stat.exists
+  sudo: no
 
 - name: prep | determine template path structure
   command: find . -type d
@@ -17,6 +19,7 @@
     chdir: "{{ role_path }}/templates/user_dir"
   register: template_dirs
   changed_when: 0
+  sudo: no
 
 - name: prep | determine file path structure
   command: find . -type d
@@ -24,6 +27,7 @@
     chdir: "{{ role_path }}/files/user_dir"
   register: file_dirs
   changed_when: 0
+  sudo: no
 
 - name: prep | create i3 directories
   file:
@@ -33,6 +37,7 @@
   with_items:
     - "{{template_dirs.stdout_lines}}"
     - "{{file_dirs.stdout_lines}}"
+  sudo: no
 
 - name: prep | get paths to template files
   command: find . -iname '*.j2' -type f
@@ -40,6 +45,7 @@
     chdir: "{{ role_path }}/templates/user_dir"
   register: template_paths
   changed_when: 0
+  sudo: no
 
 - name: prep | get paths to files
   command: find . -type f
@@ -47,6 +53,7 @@
     chdir: "{{ role_path }}/files/user_dir"
   register: file_paths
   changed_when: 0
+  sudo: no
 
 - name: install | install i3 files
   copy:
@@ -55,6 +62,7 @@
     mode: 0700
   with_items:
     - "{{ file_paths.stdout_lines }}"
+  sudo: no
 
 - name: install | install templated i3 files
   template:
@@ -63,3 +71,4 @@
     mode: 0700
   with_items:
     - "{{ template_paths.stdout_lines }}"
+  sudo: no
