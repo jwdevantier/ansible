@@ -1,0 +1,16 @@
+---
+
+- name: config | debian | install package build dependencies
+  apt:
+    pkg: "{{ item }}"
+    state: installed
+    update_cache: true
+    cache_valid_time: 3600
+  with_items:
+    - "libglib2.0-dev"
+    - "libglib2.0-dev"
+    - "libpango1.0-dev"
+    - "libpangocairo-1.0-0"
+    - "libcairo2-dev"
+    - "libjpeg-dev"
+    - "libpng12-dev"

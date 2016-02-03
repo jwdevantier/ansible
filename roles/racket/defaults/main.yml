@@ -1,0 +1,12 @@
+---
+
+rkt__tmp_dir: "/tmp/ansible/racket"
+
+rkt__ver: 6.3
+rkt__uri: "https://mirror.racket-lang.org/installers/{{ rkt__ver }}/racket-{{ rkt__ver }}-src-builtpkgs.tgz"
+rkt__pkg_fname: "racket-{{ rkt__ver }}-src.tgz"
+
+rkt__pkg_dstdir: "{{ rkt__tmp_dir }}"
+rkt__pkg_dst: "{{ rkt__pkg_dstdir}}/{{ rkt__pkg_fname }}"
+
+rkt__inst_prefix: "/opt/racket"

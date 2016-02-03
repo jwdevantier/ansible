@@ -1,0 +1,54 @@
+---
+
+- name: config | ensure tmp/dl dirs exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    recurse: true
+    mode: 0777
+  with_items:
+    - "{{ rkt__tmp_dir }}"
+    - "{{ rkt__pkg_dstdir }}"
+
+- stat:
+    path: "{{ rkt__pkg_dst }}"
+  register: st_pkg
+  
+- name: config | download package
+  get_url:
+    url: "{{ rkt__uri }}"
+    dest: "{{ rkt__pkg_dst }}"
+    mode: 0755
+  when: st_pkg.stat.exists == false
+
+- name: config | extract source
+  unarchive:
+    src: "{{ rkt__pkg_dst }}"
+    dest: "{{ rkt__tmp_dir}}"
+    copy: no
+    mode: 0755
+  register: unarchive
+
+- set_fact:
+    rkt__src_dir: "{{ rkt__tmp_dir }}/racket-{{ rkt__ver }}/src"
+
+- include: inst_fedora.yml
+  when: "{{ansible_distribution|lower == 'fedora'}}"
+
+- include: inst_debian.yml
+  when: "{{ansible_os_family|lower == 'debian'}}"
+    
+- name: config | configure package
+  command: "./configure --prefix={{ rkt__inst_prefix }}"
+  args:
+    chdir: "{{ rkt__src_dir }}"
+
+- name: config | build package
+  command: make
+  args:
+    chdir: "{{ rkt__src_dir }}"
+
+- name: install | install package
+  command: make install
+  args:
+    chdir: "{{ rkt__src_dir }}"
