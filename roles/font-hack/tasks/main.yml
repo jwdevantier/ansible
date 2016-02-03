@@ -1,0 +1,24 @@
+---
+
+- name: config | ensure fontdir exists
+  file:
+    path: "{{ font_hack__font_dir }}"
+    state: directory
+    recurse: yes
+    mode: 0700
+
+- name: install | download font hack (OTF)
+  get_url:
+    url: "{{ font_hack__base_url }}/{{ item }}"
+    dest: "{{ font_hack__font_dir }}/{{ item }}"
+    mode: 0755
+  with_items:
+    - "Hack-Bold.otf"
+    - "Hack-BoldItalic.otf"
+    - "Hack-Italic.otf"
+    - "Hack-Regular.otf"
+  register: font_install
+
+- name: config | update font cache
+  command: fc-cache -fv
+  when: font_install|changed

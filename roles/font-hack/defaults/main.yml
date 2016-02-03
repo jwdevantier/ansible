@@ -1,0 +1,5 @@
+---
+
+font_hack__base_url: "https://github.com/chrissimpkins/Hack/raw/master/build/otf/"
+font_hack__fonts_dir: "{{ ansible_user_dir }}/.local/share/fonts"
+font_hack__font_dir: "{{ font_hack__fonts_dir }}/font-hack"

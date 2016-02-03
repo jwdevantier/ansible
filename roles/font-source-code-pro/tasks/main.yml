@@ -1,0 +1,38 @@
+---
+
+- name: config | ensure download dir exists
+  file:
+    path: "{{ font_scp__pkg_dstdir }}"
+    state: directory
+    recurse: true
+    mode: 0700
+
+- stat:
+    path: "{{ font_scp__pkg_dst }}"
+  register: st_font_scp_pkg
+  
+- name: config | download font
+  get_url:
+    url: "{{ font_scp__uri }}"
+    dest: "{{ font_scp__pkg_dst }}"
+    mode: 0755
+  when: st_font_scp_pkg.stat.exists == false
+
+- name: config | ensure fontdir exists
+  file:
+    path: "{{ font_scp__font_dir }}"
+    state: directory
+    recurse: true
+    mode: 0700
+
+- name: install | extract font
+  unarchive:
+    src: "{{ font_scp__pkg_dst }}"
+    dest: "{{ font_scp__font_dir }}"
+    copy: no
+    mode: 0755
+  register: unarchive
+
+- name: config | update font cache
+  command: fc-cache -fv
+  when: unarchive|changed

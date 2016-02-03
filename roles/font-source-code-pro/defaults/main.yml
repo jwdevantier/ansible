@@ -1,0 +1,16 @@
+---
+
+font_scp__pkg_dstdir: "/tmp/ansible"
+
+# !! don't leave w/o quotes as ansible(python) will interpret it as a number.
+font_scp__ver_roman: "2.010"
+font_scp__ver_it: "1.030"
+
+font_scp__pkg_fname: "font-source-code-pro.tar.gz"
+font_scp__uri: "https://github.com/adobe-fonts/source-code-pro/archive/{{ font_scp__ver_roman }}R-ro/{{ font_scp__ver_it }}R-it.tar.gz"
+
+font_scp__pkg_dstdir: "/tmp/ansible"
+font_scp__pkg_dst: "{{ font_scp__pkg_dstdir }}/{{ font_scp__pkg_fname }}"
+
+font_scp__fonts_dir: "{{ ansible_user_dir }}/.local/share/fonts"
+font_scp__font_dir: "{{ font_scp__fonts_dir }}/font-source-code-pro"
