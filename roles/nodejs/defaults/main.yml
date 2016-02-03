@@ -2,7 +2,8 @@
 #present|absent
 nodejs__state: present
 
-nodejs__pkg_ver: v0.12.7
+# version number taken from https://nodejs.org/en/download
+nodejs__pkg_ver: v4.2.6
 nodejs__arch: x64
 nodejs__pkg_name: "node-{{nodejs__pkg_ver}}-linux-{{nodejs__arch}}"
 nodejs__pkg_url: "http://nodejs.org/dist/{{ nodejs__pkg_ver }}/{{ nodejs__pkg_name }}.tar.gz"

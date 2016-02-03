@@ -1,10 +1,12 @@
 ---
 #Check if we even need to bother with all this
-- stat:
+- name: is an earlier version installed using this recipe?
+  stat:
     path: "{{ nodejs__version_tag }}"
   register: st_vtag
 
-- shell: "cat {{ nodejs__version_tag }}"
+- name: earlier node version found - reading its version file
+  shell: "cat {{ nodejs__version_tag }}"
   when: st_vtag is defined and st_vtag.stat.exists
   register: vtag_read
   changed_when: 0
@@ -14,8 +16,14 @@
 - set_fact:
     do_inst: "{{vtag_read|skipped or vtag_read.stdout|default('unset') != curr_vtag}}"
 
-- include: doinst.yml
-  when: do_inst == "True"
+#- debug: msg="vtag_read skipped - {{vtag_read|skipped}}"
+#- debug: msg="vtag_read.stdout / unset - {{vtag_read.stdout|default('unset')}}"
+#- debug: msg="cur_vtag -- {{curr_vtag}}"
+#- debug: msg="do_inst -- {{do_inst}}"
+
+- name: either no- or an old version found - installing!
+  include: doinst.yml
+  when: do_inst
 
 - name: install | install zsh env file
   template:

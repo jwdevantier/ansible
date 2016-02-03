@@ -1,6 +1,6 @@
 ---
 # Remove old dir if necessary
-- name: remove old go install
+- name: remove old install
   file:
     state: absent
     path: "{{ nodejs__node_root }}"
@@ -9,7 +9,7 @@
     path: "{{ nodejs__pkg_dst }}"
   register: st_nodejs_pkg
 
-- name: config | download nodejs
+- name: config | download
   get_url:
     url: "{{ nodejs__pkg_url }}"
     dest: "{{ nodejs__pkg_dst }}"
@@ -22,7 +22,7 @@
     state: directory
     recurse: true
 
-- name: install | extract nodejs
+- name: install | extract
   unarchive:
     src: "{{ nodejs__pkg_dst }}"
     dest: "{{ nodejs__dstdir }}"
