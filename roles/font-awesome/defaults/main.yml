@@ -1,6 +1,6 @@
 ---
 
-font_awesome__version: 4.4.0
+font_awesome__version: 4.5.0
 font_awesome__url: "http://fortawesome.github.io/Font-Awesome/assets/font-awesome-{{font_awesome__version}}.zip"
 font_awesome__pkg_dst: "/tmp/font-awesome-{{font_awesome__version}}.zip"
 
