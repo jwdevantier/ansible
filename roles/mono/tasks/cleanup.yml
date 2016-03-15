@@ -1,0 +1,9 @@
+---
+
+- name: cleanup | remove install dir
+  file:
+    state: absent
+    path: "{{ item }}"
+  with_items:
+    - "{{ mono__install_dir }}"
+    - "{{ mono__zsh_env_file_dstdir }}/{{ mono__zsh_env_file_name }}"

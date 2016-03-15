@@ -1,0 +1,34 @@
+---
+
+- name: config | ensure builddir exists
+  file:
+    path: "{{ builddir }}"
+    state: directory
+    recurse: true
+
+# kept getting errors with the unarchive module - so ignore the warning
+# encouraging us to use that instead.
+- name: "extract source"
+  command: "tar xvjf '{{ tmp }}/{{ pkg_fname }}'"
+  args:
+    chdir: "{{ tmp }}"
+
+- name: configuring source (running autogen)
+  command: "./autogen.sh --prefix='{{ installdir }}'"
+  args:
+    chdir: "{{ builddir }}"
+
+- name: compiling (running 'make')
+  command: "make"
+  args:
+    chdir: "{{ builddir }}"
+
+- name: installing (running 'make install')
+  command: "make install"
+  args:
+    chdir: "{{ builddir }}"
+
+- name: install version tag file
+  template:
+    src: version_tag.j2
+    dest: "{{ curr_vtag_path }}"

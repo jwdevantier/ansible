@@ -18,8 +18,8 @@
 #      sudo: false
 #    - role: font-source-code-pro
 #      sudo: false
-    - role: i3
-      sudo: yes
+#    - role: i3
+#      sudo: yes
 #    - role: docker
 #      sudo: true
 #    - role: virtualbox
@@ -44,3 +44,9 @@
 #      sudo: yes
 #    - role: mysql-workbench
 #      sudo: yes
+#    - role: elementary-theme
+#      sudo: yes
+#    - role: mono
+#      sudo: false
+    - role: fsharp
+      sudo: false

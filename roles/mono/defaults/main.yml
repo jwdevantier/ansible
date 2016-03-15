@@ -1,0 +1,38 @@
+---
+
+
+mono__pkg_ver: 4.3.2
+mono__pkg_build: 467
+mono__pkg_fullver: "{{ mono__pkg_ver }}.{{ mono__pkg_build }}"
+
+mono__pkg_fname: "mono-{{mono__pkg_fullver}}.tar.bz2"
+mono__pkg_url: "http://download.mono-project.com/sources/mono/{{ mono__pkg_fname }}"
+
+
+
+# directory in which we'll download sources & compile
+tmp__ansible: "/tmp/ansible/"
+mono__pkg_build_root: "{{tmp__ansible}}/mono-{{ mono__pkg_ver }}"
+
+# directory into which we'll install the software
+mono__install_root: "{{ global_app_dir }}"
+# root of the install
+mono__install_dir: "{{ mono__install_root }}/mono"
+
+
+
+# name of ZSH env file
+mono__zsh_env_file_name: "50-mono.zsh"
+# directory into which we'll install a ZSH env file
+mono__zsh_env_file_dstdir: "{{ global_zsh_env_dir }}"
+
+
+
+# The version tag file will be used to skip the recipe if everything is
+# up-to-date. The tag will be a combination of the version tag
+# {{mono__pkg_fullver}} and {{mono__role_version}}.
+mono__version_tag_path: "{{ mono__install_dir }}/.version"
+mono__role_version: r1
+
+# present|absent
+mono__state: present

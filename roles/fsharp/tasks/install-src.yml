@@ -1,0 +1,46 @@
+---
+
+# kept getting errors with the unarchive module - so ignore the warning
+# encouraging us to use that instead.
+
+#vars:
+#  build_env:
+#    LD_LIBRARY_PATH: "{{ lookup('env', 'LD_LIBRARY_PATH') }}:{{ mono__install_dir }}/lib"
+#    PKG_CONFIG_PATH: "{{ mono__install_dir }}/lib/pkgconfig"
+
+- set_fact:
+    build_env:
+      LD_LIBRARY_PATH: "{{ lookup('env', 'LD_LIBRARY_PATH') }}:{{ mono__install_dir }}/lib"
+      PKG_CONFIG_PATH: "{{ mono__install_dir }}/lib/pkgconfig"
+
+- name: configuring source (running autogen)
+  command: "./autogen.sh --prefix='{{ installdir }}'"
+  args:
+    chdir: "{{ builddir }}"
+  environment: "{{ build_env }}"
+
+- name: compiling (running 'make')
+  command: "make"
+  args:
+    chdir: "{{ builddir }}"
+  environment: "{{ build_env }}"
+
+- name: installing (running 'make install')
+  command: "make install"
+  args:
+    chdir: "{{ builddir }}"
+  environment: "{{ build_env }}"
+
+- name: grab version hash of install
+  shell: "git rev-parse HEAD"
+  args:
+    chdir: "{{ builddir }}"
+  register: pkg_hash
+
+- set_fact:
+    pkg_vtag: "{{ pkg_hash.stdout }}"
+
+- name: install version tag file
+  template:
+    src: version_tag.j2
+    dest: "{{ curr_vtag_path }}"

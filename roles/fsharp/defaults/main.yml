@@ -1,0 +1,40 @@
+---
+
+fsharp__commit_hash: "5a3ee3641c48bbbf1b495b535a8ca348d0c806d1"
+
+fsharp__git_repo: "https://github.com/fsharp/fsharp.git"
+# see https://github.com/fsharp/fsharp
+fsharp__git_branch: master
+
+# directory in which we'll download sources & compile
+tmp__ansible: "/tmp/ansible/"
+fsharp__pkg_build_root: "{{tmp__ansible}}/fsharp"
+
+# directory into which we'll install the software
+fsharp__install_root: "{{ global_app_dir }}"
+
+
+# needed to building fsharp (to link against)
+mono__install_dir: "{{ global_app_dir }}/mono"
+
+# root of the install
+# must be installed in same dir as mono or all xbuild processes will fail
+# (=> you won't be able to build anything meaningful)
+fsharp__install_dir: "{{ mono__install_dir }}"
+
+
+# name of ZSH env file
+fsharp__zsh_env_file_name: "50-fsharp.zsh"
+# directory into which we'll install a ZSH env file
+fsharp__zsh_env_file_dstdir: "{{ global_zsh_env_dir }}"
+
+
+
+# The version tag file will be used to skip the recipe if everything is
+# up-to-date. The tag will be a combination of the version tag
+# {{fsharp__pkg_fullver}} and {{fsharp__role_version}}.
+fsharp__version_tag_path: "{{ fsharp__install_dir }}/.fsharp_version"
+fsharp__role_version: r1
+
+# present|absent
+fsharp__state: present

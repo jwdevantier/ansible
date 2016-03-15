@@ -1,0 +1,50 @@
+---
+
+- set_fact:
+    tmp: "{{ tmp__ansible }}"
+    builddir: "{{ fsharp__pkg_build_root }}"
+    git_branch: "{{ fsharp__git_branch }}"
+    git_repo: "{{ fsharp__git_repo }}"
+
+- name: install build dependencies
+  apt:
+  args:
+    pkg: "{{ item }}"
+    state: installed
+    update_cache: true
+    cache_valid_time: 3600
+  with_items:
+    - autoconf
+    - libtool
+    - pkg-config
+    - make
+    - git
+    - automake
+  sudo: yes
+
+# Cannot do this because we must install fsharp into the mono dir
+# Remove old dir
+#- name: remove old install
+#  file:
+#    state: absent
+#    path: "{{ installdir }}"
+
+# Ensure temp dir exists & package is downloaded
+# (otherwise, create dir and download the package)
+
+- name: config | ensure tmp exists
+  file:
+    path: "{{ tmp }}"
+    state: directory
+    recurse: true
+
+- name: download source
+  git:
+    repo: "{{ git_repo }}"
+    version: "{{ git_branch }}"
+    dest: "{{ builddir }}"
+    force: yes
+
+# Build source (& install)
+# ------------
+- include: install-src.yml

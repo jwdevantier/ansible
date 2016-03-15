@@ -1,0 +1,31 @@
+---
+
+- set_fact:
+    pkg_vtag: "{{ fsharp__commit_hash }}" #vtag of what this role installs
+    curr_vtag_path: "{{ fsharp__version_tag_path }}" #vtag file showing what's installed
+    env_file: "{{ fsharp__zsh_env_file_name }}" #env file to install
+    env_file_dir: "{{ fsharp__zsh_env_file_dstdir }}" #where to install env file
+    installdir: "{{ fsharp__install_dir }}"
+
+#Check if we even need to bother with all this
+- stat:
+    path: "{{ curr_vtag_path }}"
+  register: st_vtag
+
+- shell: "cat {{ curr_vtag_path }}"
+  when: st_vtag is defined and st_vtag.stat.exists
+  register: curr_vtag
+  changed_when: 0
+
+- set_fact:
+    do_inst: "{{curr_vtag|skipped or curr_vtag.stdout|default('unset') != pkg_vtag}}"
+
+- include: doinst.yml
+  when: do_inst == "True"
+
+# always do this - may have small adjustments to ZSH env file which
+# shouldn't have to be accomplished by a full package rebuild.
+- name: install | install zsh env file
+  template:
+    src: "{{ env_file }}.j2"
+    dest: "{{ env_file_dir }}/{{ env_file }}"

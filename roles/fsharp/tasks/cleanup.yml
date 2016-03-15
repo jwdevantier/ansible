@@ -1,0 +1,10 @@
+#- name: cleanup | remove install dir
+#  file:
+#    state: absent
+#    path: "{{ item }}"
+#  with_items:
+#    - "{{ fsharp__install_dir }}"
+#    - "{{ fsharp__zsh_env_file_dstdir }}/{{ fsharp__zsh_env_file_name }}"
+
+- debug: msg="Cannot cleanup - installed in mono dir - you need to nuke mono"
+  failed_when: 1

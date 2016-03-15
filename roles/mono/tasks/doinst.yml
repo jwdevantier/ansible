@@ -1,0 +1,37 @@
+---
+
+- set_fact:
+    pkg_fname: "{{ mono__pkg_fname }}"                          # filename of the downloaded package
+    pkg_url: "{{ mono__pkg_url }}"
+    tmp: "{{ tmp__ansible }}"
+    builddir: "{{ mono__pkg_build_root }}"
+
+# Remove old dir
+- name: remove old install
+  file:
+    state: absent
+    path: "{{ installdir }}"
+
+# Ensure temp dir exists & package is downloaded
+# (otherwise, create dir and download the package)
+- stat:
+    path: "{{ tmp }}/{{ pkg_fname }}"
+  register: st_pkg
+
+- name: config | ensure tmp exists
+  file:
+    path: "{{ tmp }}"
+    state: directory
+    recurse: true
+  when: st_pkg.stat.exists == false
+
+- name: config | download
+  get_url:
+    url: "{{ pkg_url }}"
+    dest: "{{ tmp }}"
+    mode: 0755
+  when: st_pkg.stat.exists == false
+
+# Build source (& install)
+# ------------
+- include: install-src.yml
