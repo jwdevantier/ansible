@@ -27,3 +27,14 @@
     pkg: docker-engine
     state: installed
     update_cache: true
+
+- name: install upstart & systemd rules
+  template:
+    src: "debian/{{item.src}}"
+    dest: "{{item.dst}}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - { src: "docker.j2", dst: "/etc/default/docker" }
+    - { src: "docker-systemd.j2", dst: "/lib/systemd/system/docker.service" }
