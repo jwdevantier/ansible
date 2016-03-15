@@ -1,0 +1,28 @@
+---
+
+#- debug: msg="Detected a Debian-based system, using elementary OS ppa install..."
+
+# needed by 'python-apt' module
+#- name: install python-apt
+#  apt: pkg=python-apt state=installed update_cache=true cache_valid_time=3600
+#  register: apt_python
+#  failed_when: apt_python|failed and apt_python.msg.find('Could not fetch updated apt') == -1
+  
+#- name: add elementary OS art ppa
+#  apt_repository:
+#    repo: 'ppa:elementaryart/ppa'
+#    update_cache: yes
+#    state: present
+
+- name: install | software
+  apt:
+    pkg: "{{ item }}"
+    state: latest
+    update_cache: true
+    cache_valid_time: 3600
+  with_items:
+    - gtk2-engines-aurora
+    - gtk2-engines-murrine
+#    - elementary-icon-theme
+#    - elementary-theme
+

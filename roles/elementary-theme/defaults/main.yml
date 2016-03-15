@@ -1,0 +1,10 @@
+---
+
+ansible__tmp_dir: "/tmp/ansible"
+eos__tmp_dir: "{{ansible__tmp_dir}}/elementary-theme"
+
+eos__theme_gtk_ver: "4.0.6"
+eos__theme_gtk_uri: "https://launchpad.net/egtk/4.x/{{eos__theme_gtk_ver}}/+download/elementary.tar.xz"
+eos__theme_gtk_fname: "elementary-gtk-theme-{ {eos__theme_gtk_ver }}.tar.xz"
+
+eos__theme_install_destdir: "/usr/share/themes"

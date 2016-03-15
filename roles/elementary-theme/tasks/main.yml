@@ -1,0 +1,55 @@
+---
+
+#- include: inst_fedora.yml
+#  when: "{{ansible_distribution|lower == 'fedora'}}"
+
+- debug: msg="won't work if not on debian, cannot figure out how to detect this atm because ansible is shit..."
+
+- include: inst_debian.yml
+  when: "{{ansible_os_family|lower == 'debian'}}"
+  register: deb_install
+
+- name: config | ensure ansible tmp dir exists
+  file:
+    path: "{{ ansible__tmp_dir }}"
+    state: directory
+    recurse: yes
+    mode: 0777
+
+- name: config | ensure role tmp dir exists
+  file:
+    path: "{{ eos__tmp_dir }}"
+    state: directory
+    recurse: yes
+    mode: 0755
+
+- set_fact:
+    eos__pkg_path: "{{ eos__tmp_dir }}/{{ eos__theme_gtk_fname }}"
+  
+- name: config | download theme
+  get_url:
+    url: "{{ eos__theme_gtk_uri }}"
+    dest: "{{ eos__pkg_path }}"
+    mode: 0755
+  register: dl_theme
+
+- name: config | determine if theme is installed
+  stat:
+    path: "{{ eos__theme_install_destdir }}/elementary"
+  register: st_theme
+  
+- name: install | install theme
+  unarchive:
+    src: "{{ eos__pkg_path }}"
+    dest: "{{ eos__theme_install_destdir }}"
+    copy: no
+    mode: 0755
+  when: dl_theme|changed or ( st_theme is defined and st_theme.stat.exists == False )
+
+- name: config | use gtk2 theme
+  template:
+    src: ".gtkrc-2.0.j2"
+    dest: "~/.gtkrc-2.0"
+    owner: "{{ ansible_user_id }}"
+    mode: 0700
+  sudo: no
